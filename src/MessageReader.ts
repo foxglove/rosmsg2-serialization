@@ -104,8 +104,8 @@ const deserializers = new Map<string, Deserializer>([
   ["float32", (reader) => reader.float32()],
   ["float64", (reader) => reader.float64()],
   ["string", (reader) => reader.string()],
-  ["time", (reader) => ({ sec: reader.int32(), nsec: reader.int32() })],
-  ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.int32() })],
+  ["time", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
+  ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
 ]);
 
 const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
@@ -145,7 +145,7 @@ function readTimeArray(reader: CdrReader, count: number): Time[] {
   const array = new Array<Time>(count);
   for (let i = 0; i < count; i++) {
     const sec = reader.int32();
-    const nsec = reader.int32();
+    const nsec = reader.uint32();
     array[i] = { sec, nsec };
   }
   return array;
