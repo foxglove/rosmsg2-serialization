@@ -352,10 +352,10 @@
   resolved "https://registry.yarnpkg.com/@foxglove/eslint-plugin/-/eslint-plugin-0.10.0.tgz#11592a1d87b7b71b97ca51027b3bd3fe32877dc7"
   integrity sha512-Lrt0elHfjOId8zRdIjUvk3Dd3e6Ii2LZLxKrtV4ancyvWFnNl3MaPNmFooPkMw01MhcDRYtZr5DvbcGVyCm+SQ==
 
-"@foxglove/rosmsg@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@foxglove/rosmsg/-/rosmsg-0.1.1.tgz#9469ff413db965ae9d60e609b691ddd40992a26e"
-  integrity sha512-EG8Xrp0R9qZ21mtb8SX7iNrTGas6jRx7jYvqNYmUdbBYVroujy2Sus7ek35cKeOt1kKJFlzCHOUDBy7gdt1k1A==
+"@foxglove/rosmsg@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@foxglove/rosmsg/-/rosmsg-0.2.0.tgz#641d5ed04bc0c6974735436077c48f49a1e22343"
+  integrity sha512-jNIefCCZFiCuX8F70/BP5xOdG8KJdN0yuPlSJ8Eva6aU9T+sD5NBJZKfJVPpSp91a8G/pmWXAZ07hbQ9mqKa1w==
   dependencies:
     moo "^0.5.1"
     nearley "^2.20.1"

@@ -272,4 +272,42 @@ describe("MessageReader", () => {
       expect(read).toEqual(expected);
     },
   );
+
+  it("should deserialize a ROS2 log message", () => {
+    const buffer = Uint8Array.from(
+      Buffer.from(
+        "00010000fb65865e80faae0614000000120000006d696e696d616c5f7075626c69736865720000001e0000005075626c697368696e673a202748656c6c6f2c20776f726c64212030270000004c0000002f6f70742f726f73325f77732f656c6f7175656e742f7372632f726f73322f6578616d706c65732f72636c6370702f6d696e696d616c5f7075626c69736865722f6c616d6264612e637070000b0000006f70657261746f722829007326000000",
+        "hex",
+      ),
+    );
+    const msgDef = `
+    byte DEBUG=10
+    byte INFO=20
+    byte WARN=30
+    byte ERROR=40
+    byte FATAL=50
+    ##
+    ## Fields
+    ##
+    builtin_interfaces/Time stamp
+    uint8 level
+    string name # name of the node
+    string msg # message
+    string file # file the message came from
+    string function # function the message came from
+    uint32 line # line the message came from
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({
+      stamp: { sec: 1585866235, nsec: 112130688 },
+      level: 20,
+      name: "minimal_publisher",
+      msg: "Publishing: 'Hello, world! 0'",
+      file: "/opt/ros2_ws/eloquent/src/ros2/examples/rclcpp/minimal_publisher/lambda.cpp",
+      function: "operator()",
+      line: 38,
+    });
+  });
 });
