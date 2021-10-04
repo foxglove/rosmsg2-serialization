@@ -60,7 +60,7 @@
     "typescript": "4.3.5"
   },
   "dependencies": {
-    "@foxglove/cdr": "^1.1.1",
+    "@foxglove/cdr": "^1.2.0",
     "@foxglove/rosmsg": "^2.0.0",
     "@foxglove/rostime": "^1.1.0"
   }

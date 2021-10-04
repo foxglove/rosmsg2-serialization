@@ -324,10 +324,10 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@foxglove/cdr@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@foxglove/cdr/-/cdr-1.1.1.tgz#c0a77713ba67b2ed6feaf5f64fa8c50fe713534d"
-  integrity sha512-Bv5bjHCh4K3x8OdBvt/0W+EEUIrDlM7+rLj2/LpguUXET51EsBVACCzYRvvZtQdAkJUZxVhuRnI3e8+rISWNcg==
+"@foxglove/cdr@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@foxglove/cdr/-/cdr-1.2.0.tgz#b8c69b37299ae47bb3ffc0f0eef70d99cf9a0a4b"
+  integrity sha512-KuPGicuOPA4U5Y+a3YfHe6prQhbDlI6zxaIYhhKhF+2/qTophkOemJEqbJcAOfy1rim7+O5n2S9ATPK63C9GPw==
 
 "@foxglove/eslint-plugin@0.14.0":
   version "0.14.0"

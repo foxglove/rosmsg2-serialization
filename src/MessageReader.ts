@@ -38,7 +38,7 @@ export class MessageReader<T = unknown> {
 
   // We template on R here for call site type information if the class type information T is not
   // known or available
-  readMessage<R = T>(buffer: Readonly<Uint8Array>): R {
+  readMessage<R = T>(buffer: ArrayBufferView): R {
     const reader = new CdrReader(buffer);
     return this.readComplexType(this.rootDefinition, reader) as R;
   }
