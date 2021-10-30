@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@foxglove/cdr": "^1.2.0",
-    "@foxglove/rosmsg": "^2.0.0",
+    "@foxglove/rosmsg": "^2.0.0 || ^3.0.0",
     "@foxglove/rostime": "^1.1.0"
   }
 }
