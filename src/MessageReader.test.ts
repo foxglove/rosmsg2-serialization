@@ -310,4 +310,48 @@ describe("MessageReader", () => {
       line: 38,
     });
   });
+
+  it("should deserialize a ROS2 tf2_msgs/TFMessage", () => {
+    const buffer = Uint8Array.from(
+      Buffer.from(
+        "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "hex",
+      ),
+    );
+    const msgDef = `
+    geometry_msgs/TransformStamped[] transforms
+    ================================================================================
+    MSG: geometry_msgs/TransformStamped
+    Header header
+    string child_frame_id # the frame id of the child frame
+    Transform transform
+    ================================================================================
+    MSG: std_msgs/Header
+    time stamp
+    string frame_id
+    ================================================================================
+    MSG: geometry_msgs/Transform
+    Vector3 translation
+    Quaternion rotation
+    ================================================================================
+    MSG: geometry_msgs/Vector3
+    float64 x
+    float64 y
+    float64 z
+    ================================================================================
+    MSG: geometry_msgs/Quaternion
+    float64 x
+    float64 y
+    float64 z
+    float64 w
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({
+      header: {
+        stamp: { sec: 1585866235, nsec: 112130688 },
+      },
+    });
+  });
 });
