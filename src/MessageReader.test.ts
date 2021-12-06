@@ -314,32 +314,32 @@ describe("MessageReader", () => {
   it("should deserialize a ROS2 tf2_msgs/TFMessage", () => {
     const buffer = Uint8Array.from(
       Buffer.from(
-        "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f03f",
         "hex",
       ),
     );
     const msgDef = `
-    geometry_msgs/TransformStamped[] transforms
+    geometry_msgs/msg/TransformStamped[] transforms
     ================================================================================
-    MSG: geometry_msgs/TransformStamped
+    MSG: geometry_msgs/msg/TransformStamped
     Header header
     string child_frame_id # the frame id of the child frame
     Transform transform
     ================================================================================
-    MSG: std_msgs/Header
+    MSG: std_msgs/msg/Header
     time stamp
     string frame_id
     ================================================================================
-    MSG: geometry_msgs/Transform
+    MSG: geometry_msgs/msg/Transform
     Vector3 translation
     Quaternion rotation
     ================================================================================
-    MSG: geometry_msgs/Vector3
+    MSG: geometry_msgs/msg/Vector3
     float64 x
     float64 y
     float64 z
     ================================================================================
-    MSG: geometry_msgs/Quaternion
+    MSG: geometry_msgs/msg/Quaternion
     float64 x
     float64 y
     float64 z
@@ -349,9 +349,19 @@ describe("MessageReader", () => {
     const read = reader.readMessage(buffer);
 
     expect(read).toEqual({
-      header: {
-        stamp: { sec: 1585866235, nsec: 112130688 },
-      },
+      transforms: [
+        {
+          header: {
+            stamp: { sec: 1638821672, nsec: 836230505 },
+            frame_id: "turtle1",
+          },
+          child_frame_id: "turtle1_ahead",
+          transform: {
+            translation: { x: 1, y: 0, z: 0 },
+            rotation: { x: 0, y: 0, z: 0, w: 1 },
+          },
+        },
+      ],
     });
   });
 });
