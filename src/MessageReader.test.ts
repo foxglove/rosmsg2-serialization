@@ -310,4 +310,58 @@ describe("MessageReader", () => {
       line: 38,
     });
   });
+
+  it("should deserialize a ROS2 tf2_msgs/TFMessage", () => {
+    const buffer = Uint8Array.from(
+      Buffer.from(
+        "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f03f",
+        "hex",
+      ),
+    );
+    const msgDef = `
+    geometry_msgs/msg/TransformStamped[] transforms
+    ================================================================================
+    MSG: geometry_msgs/msg/TransformStamped
+    Header header
+    string child_frame_id # the frame id of the child frame
+    Transform transform
+    ================================================================================
+    MSG: std_msgs/msg/Header
+    time stamp
+    string frame_id
+    ================================================================================
+    MSG: geometry_msgs/msg/Transform
+    Vector3 translation
+    Quaternion rotation
+    ================================================================================
+    MSG: geometry_msgs/msg/Vector3
+    float64 x
+    float64 y
+    float64 z
+    ================================================================================
+    MSG: geometry_msgs/msg/Quaternion
+    float64 x
+    float64 y
+    float64 z
+    float64 w
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({
+      transforms: [
+        {
+          header: {
+            stamp: { sec: 1638821672, nsec: 836230505 },
+            frame_id: "turtle1",
+          },
+          child_frame_id: "turtle1_ahead",
+          transform: {
+            translation: { x: 1, y: 0, z: 0 },
+            rotation: { x: 0, y: 0, z: 0, w: 1 },
+          },
+        },
+      ],
+    });
+  });
 });
