@@ -44,7 +44,7 @@
   "devDependencies": {
     "@foxglove/eslint-plugin": "0.14.0",
     "@types/jest": "^27.0.1",
-    "@types/prettier": "2.3.2",
+    "@types/prettier": "^2.3.2",
     "@typescript-eslint/eslint-plugin": "4.29.2",
     "@typescript-eslint/parser": "4.29.2",
     "eslint": "7.32.0",
@@ -56,12 +56,12 @@
     "eslint-plugin-prettier": "3.4.0",
     "jest": "27.0.6",
     "prettier": "2.3.2",
-    "ts-jest": "^27.0.5",
+    "ts-jest": "27.0.5",
     "typescript": "4.3.5"
   },
   "dependencies": {
     "@foxglove/cdr": "^2.0.0",
-    "@foxglove/rosmsg": "^2.0.0 || ^3.0.0",
+    "@foxglove/rosmsg": "^3.1.0",
     "@foxglove/rostime": "^1.1.2"
   }
 }
