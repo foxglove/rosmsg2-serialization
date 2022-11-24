@@ -1,6 +1,6 @@
 import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
 
-import { MessageReader } from "./MessageReader";
+import { MessageWriter } from "./MessageWriter";
 
 const serializeString = (str: string): Uint8Array => {
   const data = Buffer.from(str, "utf8");
@@ -13,7 +13,7 @@ const float32Buffer = (floats: number[]): Uint8Array => {
   return new Uint8Array(Float32Array.from(floats).buffer);
 };
 
-describe("MessageReader", () => {
+describe("MessageWriter", () => {
   it.each([
     [`int8 sample # lowest`, [0x80], { sample: -128 }],
     [`int8 sample # highest`, [0x7f], { sample: 127 }],
@@ -50,7 +50,7 @@ describe("MessageReader", () => {
       { sample: 0.123456789121212121212 },
     ],
     [
-      `time stamp`,
+      `builtin_interfaces/Time stamp`,
       [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
       {
         stamp: {
@@ -60,7 +60,7 @@ describe("MessageReader", () => {
       },
     ],
     [
-      `duration stamp`,
+      `builtin_interfaces/Duration stamp`,
       [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
       {
         stamp: {
@@ -262,21 +262,21 @@ describe("MessageReader", () => {
       },
     ],
   ])(
-    "should deserialize %s",
-    (msgDef: string, arr: Iterable<number>, expected: Record<string, unknown>) => {
-      const buffer = Uint8Array.from([0, 1, 0, 0, ...arr]);
-      const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
-      const read = reader.readMessage(buffer);
+    "should serialize %s",
+    (msgDef: string, arr: Iterable<number>, message: Record<string, unknown>) => {
+      const expected = Uint8Array.from([0, 1, 0, 0, ...arr]);
+      const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+      const written = writer.writeMessage(message);
 
-      // check that our message matches the object
-      expect(read).toEqual(expected);
+      expect(written).toBytesEqual(expected);
+      expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
     },
   );
 
-  it("should deserialize a ROS 2 log message", () => {
-    const buffer = Uint8Array.from(
+  it("should serialize a ROS 2 log message", () => {
+    const expected = Uint8Array.from(
       Buffer.from(
-        "00010000fb65865e80faae0614000000120000006d696e696d616c5f7075626c69736865720000001e0000005075626c697368696e673a202748656c6c6f2c20776f726c64212030270000004c0000002f6f70742f726f73325f77732f656c6f7175656e742f7372632f726f73322f6578616d706c65732f72636c6370702f6d696e696d616c5f7075626c69736865722f6c616d6264612e637070000b0000006f70657261746f722829007326000000",
+        "00010000fb65865e80faae0614000000120000006d696e696d616c5f7075626c69736865720000001e0000005075626c697368696e673a202748656c6c6f2c20776f726c64212030270000004c0000002f6f70742f726f73325f77732f656c6f7175656e742f7372632f726f73322f6578616d706c65732f72636c6370702f6d696e696d616c5f7075626c69736865722f6c616d6264612e637070000b0000006f70657261746f722829000026000000",
         "hex",
       ),
     );
@@ -297,10 +297,8 @@ describe("MessageReader", () => {
     string function # function the message came from
     uint32 line # line the message came from
     `;
-    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
-    const read = reader.readMessage(buffer);
-
-    expect(read).toEqual({
+    const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+    const message = {
       stamp: { sec: 1585866235, nsec: 112130688 },
       level: 20,
       name: "minimal_publisher",
@@ -308,11 +306,14 @@ describe("MessageReader", () => {
       file: "/opt/ros2_ws/eloquent/src/ros2/examples/rclcpp/minimal_publisher/lambda.cpp",
       function: "operator()",
       line: 38,
-    });
+    };
+    const written = writer.writeMessage(message);
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });
 
-  it("should deserialize a ROS 2 tf2_msgs/TFMessage", () => {
-    const buffer = Uint8Array.from(
+  it("should serialize a ROS 2 tf2_msgs/TFMessage", () => {
+    const expected = Uint8Array.from(
       Buffer.from(
         "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f03f",
         "hex",
@@ -327,7 +328,7 @@ describe("MessageReader", () => {
     Transform transform
     ================================================================================
     MSG: std_msgs/msg/Header
-    time stamp
+    builtin_interfaces/Time stamp
     string frame_id
     ================================================================================
     MSG: geometry_msgs/msg/Transform
@@ -345,10 +346,8 @@ describe("MessageReader", () => {
     float64 z
     float64 w
     `;
-    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
-    const read = reader.readMessage(buffer);
-
-    expect(read).toEqual({
+    const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+    const message = {
       transforms: [
         {
           header: {
@@ -362,6 +361,9 @@ describe("MessageReader", () => {
           },
         },
       ],
-    });
+    };
+    const written = writer.writeMessage(message);
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });
 });
