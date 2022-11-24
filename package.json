@@ -1,7 +1,7 @@
 {
   "name": "@foxglove/rosmsg2-serialization",
   "version": "1.0.7",
-  "description": "ROS2 (Robot Operating System) message serialization, for reading and writing bags and network messages",
+  "description": "ROS 2 (Robot Operating System) message serialization, for reading and writing bags and network messages",
   "license": "MIT",
   "keywords": [
     "ros",
@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@foxglove/eslint-plugin": "0.14.0",
+    "@sounisi5011/jest-binary-data-matchers": "1.2.0",
     "@types/jest": "^27.0.1",
     "@types/prettier": "^2.3.2",
     "@typescript-eslint/eslint-plugin": "4.29.2",

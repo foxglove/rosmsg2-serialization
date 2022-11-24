@@ -6,6 +6,7 @@
     "lib": ["dom", "es2020"],
     "rootDir": "./src",
     "outDir": "./dist",
+    "types": ["@sounisi5011/jest-binary-data-matchers"],
 
     "moduleResolution": "node",
     "esModuleInterop": true,
