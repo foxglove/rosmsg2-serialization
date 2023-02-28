@@ -1,5 +1,5 @@
 import { CdrReader } from "@foxglove/cdr";
-import { RosMsgDefinition, RosMsgField } from "@foxglove/rosmsg";
+import { MessageDefinition, MessageDefinitionField } from "@foxglove/message-definition";
 import { Time } from "@foxglove/rostime";
 
 export type Deserializer = (reader: CdrReader) => boolean | number | bigint | string | Time;
@@ -22,16 +22,16 @@ export type ArrayDeserializer = (
   | Time[];
 
 export class MessageReader<T = unknown> {
-  rootDefinition: RosMsgField[];
-  definitions: Map<string, RosMsgField[]>;
+  rootDefinition: MessageDefinitionField[];
+  definitions: Map<string, MessageDefinitionField[]>;
 
-  constructor(definitions: RosMsgDefinition[]) {
+  constructor(definitions: MessageDefinition[]) {
     const rootDefinition = definitions[0];
     if (rootDefinition == undefined) {
-      throw new Error("MessageReader initialized with no root RosMsgDefinition");
+      throw new Error("MessageReader initialized with no root MessageDefinition");
     }
     this.rootDefinition = rootDefinition.definitions;
-    this.definitions = new Map<string, RosMsgField[]>(
+    this.definitions = new Map<string, MessageDefinitionField[]>(
       definitions.map((def) => [def.name ?? "", def.definitions]),
     );
   }
@@ -43,7 +43,10 @@ export class MessageReader<T = unknown> {
     return this.readComplexType(this.rootDefinition, reader) as R;
   }
 
-  private readComplexType(definition: RosMsgField[], reader: CdrReader): Record<string, unknown> {
+  private readComplexType(
+    definition: MessageDefinitionField[],
+    reader: CdrReader,
+  ): Record<string, unknown> {
     const msg: Record<string, unknown> = {};
     for (const field of definition) {
       if (field.isConstant === true) {
