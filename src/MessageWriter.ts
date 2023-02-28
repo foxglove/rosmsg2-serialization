@@ -1,12 +1,12 @@
 import { CdrWriter } from "@foxglove/cdr";
-import { RosDefaultValue, RosMsgDefinition, RosMsgField } from "@foxglove/rosmsg";
+import {
+  DefaultValue,
+  MessageDefinition,
+  MessageDefinitionField,
+} from "@foxglove/message-definition";
 
-type PrimitiveWriter = (value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter) => void;
-type PrimitiveArrayWriter = (
-  value: unknown,
-  defaultValue: RosDefaultValue,
-  writer: CdrWriter,
-) => void;
+type PrimitiveWriter = (value: unknown, defaultValue: DefaultValue, writer: CdrWriter) => void;
+type PrimitiveArrayWriter = (value: unknown, defaultValue: DefaultValue, writer: CdrWriter) => void;
 
 const PRIMITIVE_SIZES = new Map<string, number>([
   ["bool", 1],
@@ -64,16 +64,16 @@ const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
  * serializes JavaScript objects to CDR-encoded binary.
  */
 export class MessageWriter {
-  rootDefinition: RosMsgField[];
-  definitions: Map<string, RosMsgField[]>;
+  rootDefinition: MessageDefinitionField[];
+  definitions: Map<string, MessageDefinitionField[]>;
 
-  constructor(definitions: RosMsgDefinition[]) {
+  constructor(definitions: MessageDefinition[]) {
     const rootDefinition = definitions[0];
     if (rootDefinition == undefined) {
-      throw new Error("MessageReader initialized with no root RosMsgDefinition");
+      throw new Error("MessageReader initialized with no root MessageDefinition");
     }
     this.rootDefinition = rootDefinition.definitions;
-    this.definitions = new Map<string, RosMsgField[]>(
+    this.definitions = new Map<string, MessageDefinitionField[]>(
       definitions.map((def) => [def.name ?? "", def.definitions]),
     );
   }
@@ -98,7 +98,7 @@ export class MessageWriter {
     return writer.data;
   }
 
-  private byteSize(definition: RosMsgField[], message: unknown, offset: number): number {
+  private byteSize(definition: MessageDefinitionField[], message: unknown, offset: number): number {
     const messageObj = message as Record<string, unknown> | undefined;
     let newOffset = offset;
 
@@ -165,7 +165,7 @@ export class MessageWriter {
     return newOffset;
   }
 
-  private write(definition: RosMsgField[], message: unknown, writer: CdrWriter): void {
+  private write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
     const messageObj = message as Record<string, unknown> | undefined;
 
     for (const field of definition) {
@@ -250,36 +250,36 @@ function fieldLength(value: unknown): number {
   return typeof length === "number" ? length : 0;
 }
 
-function bool(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function bool(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   const boolValue = typeof value === "boolean" ? value : ((defaultValue ?? false) as boolean);
   writer.int8(boolValue ? 1 : 0);
 }
 
-function int8(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int8(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.int8(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function uint8(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint8(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.uint8(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function int16(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int16(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.int16(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function uint16(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint16(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.uint16(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function int32(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int32(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.int32(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function uint32(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint32(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.uint32(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function int64(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int64(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (typeof value === "bigint") {
     writer.int64(value);
   } else if (typeof value === "number") {
@@ -289,7 +289,7 @@ function int64(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter)
   }
 }
 
-function uint64(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint64(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (typeof value === "bigint") {
     writer.uint64(value);
   } else if (typeof value === "number") {
@@ -299,19 +299,19 @@ function uint64(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter
   }
 }
 
-function float32(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function float32(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.float32(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function float64(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function float64(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.float64(typeof value === "number" ? value : ((defaultValue ?? 0) as number));
 }
 
-function string(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function string(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   writer.string(typeof value === "string" ? value : ((defaultValue ?? "") as string));
 }
 
-function time(value: unknown, _defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function time(value: unknown, _defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value == undefined) {
     writer.int32(0);
     writer.uint32(0);
@@ -322,7 +322,7 @@ function time(value: unknown, _defaultValue: RosDefaultValue, writer: CdrWriter)
   writer.uint32(timeObj.nsec ?? timeObj.nanosec ?? 0);
 }
 
-function boolArray(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function boolArray(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (Array.isArray(value)) {
     const array = new Int8Array(value);
     writer.int8Array(array);
@@ -331,7 +331,7 @@ function boolArray(value: unknown, defaultValue: RosDefaultValue, writer: CdrWri
   }
 }
 
-function int8Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int8Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Int8Array) {
     writer.int8Array(value);
   } else if (Array.isArray(value)) {
@@ -342,7 +342,7 @@ function int8Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWri
   }
 }
 
-function uint8Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint8Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Uint8Array) {
     writer.uint8Array(value);
   } else if (value instanceof Uint8ClampedArray) {
@@ -355,7 +355,7 @@ function uint8Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWr
   }
 }
 
-function int16Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int16Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Int16Array) {
     writer.int16Array(value);
   } else if (Array.isArray(value)) {
@@ -366,7 +366,7 @@ function int16Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWr
   }
 }
 
-function uint16Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint16Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Uint16Array) {
     writer.uint16Array(value);
   } else if (Array.isArray(value)) {
@@ -377,7 +377,7 @@ function uint16Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrW
   }
 }
 
-function int32Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Int32Array) {
     writer.int32Array(value);
   } else if (Array.isArray(value)) {
@@ -388,7 +388,7 @@ function int32Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWr
   }
 }
 
-function uint32Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Uint32Array) {
     writer.uint32Array(value);
   } else if (Array.isArray(value)) {
@@ -399,7 +399,7 @@ function uint32Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrW
   }
 }
 
-function int64Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function int64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof BigInt64Array) {
     writer.int64Array(value);
   } else if (Array.isArray(value)) {
@@ -410,7 +410,7 @@ function int64Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWr
   }
 }
 
-function uint64Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function uint64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof BigUint64Array) {
     writer.uint64Array(value);
   } else if (Array.isArray(value)) {
@@ -421,7 +421,7 @@ function uint64Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrW
   }
 }
 
-function float32Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function float32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Float32Array) {
     writer.float32Array(value);
   } else if (Array.isArray(value)) {
@@ -432,7 +432,7 @@ function float32Array(value: unknown, defaultValue: RosDefaultValue, writer: Cdr
   }
 }
 
-function float64Array(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function float64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (value instanceof Float64Array) {
     writer.float64Array(value);
   } else if (Array.isArray(value)) {
@@ -443,7 +443,7 @@ function float64Array(value: unknown, defaultValue: RosDefaultValue, writer: Cdr
   }
 }
 
-function stringArray(value: unknown, defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function stringArray(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
   if (Array.isArray(value)) {
     for (const item of value) {
       writer.string(typeof item === "string" ? item : "");
@@ -456,7 +456,7 @@ function stringArray(value: unknown, defaultValue: RosDefaultValue, writer: CdrW
   }
 }
 
-function timeArray(value: unknown, _defaultValue: RosDefaultValue, writer: CdrWriter): void {
+function timeArray(value: unknown, _defaultValue: DefaultValue, writer: CdrWriter): void {
   if (Array.isArray(value)) {
     for (const item of value) {
       time(item, undefined, writer);
