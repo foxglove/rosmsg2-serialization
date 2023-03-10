@@ -1,4 +1,4 @@
-import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
+import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
 
 import { MessageReader } from "./MessageReader";
 
@@ -348,6 +348,117 @@ describe("MessageReader", () => {
     float64 w
     `;
     const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({
+      transforms: [
+        {
+          header: {
+            stamp: { sec: 1638821672, nsec: 836230505 },
+            frame_id: "turtle1",
+          },
+          child_frame_id: "turtle1_ahead",
+          transform: {
+            translation: { x: 1, y: 0, z: 0 },
+            rotation: { x: 0, y: 0, z: 0, w: 1 },
+          },
+        },
+      ],
+    });
+  });
+  it("should deserialize ros2idl tf2_msg/TFMessage", () => {
+    // same buffer as above
+    const buffer = Uint8Array.from(
+      Buffer.from(
+        "0001000001000000286fae6169ddd73108000000747572746c6531000e000000747572746c65315f616865616400000000000000000000000000f03f00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f03f",
+        "hex",
+      ),
+    );
+    const msgDef = `
+================================================================================
+IDL: geometry_msgs/msg/Transforms
+
+module geometry_msgs {
+  module msg {
+    struct Transforms {
+      sequence<geometry_msgs::msg::TransformStamped> transforms;
+    };
+  };
+};
+================================================================================
+IDL: geometry_msgs/msg/TransformStamped
+
+module geometry_msgs {
+  module msg {
+    struct TransformStamped {
+      std_msgs::msg::Header header;
+      string child_frame_id; // the frame id of the child frame
+      geometry_msgs::msg::Transform transform;
+    };
+  };
+};
+================================================================================
+IDL: std_msgs/msg/Header
+
+module std_msgs {
+  module msg {
+    struct Header {
+      builtin_interfaces::Time stamp;
+      string frame_id;
+    };
+  };
+};
+================================================================================
+IDL: geometry_msgs/msg/Transform
+
+module geometry_msgs {
+  module msg {
+    struct Transform {
+      geometry_msgs::msg::Vector3 translation;
+      geometry_msgs::msg::Quaternion rotation;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/Vector3
+
+module geometry_msgs {
+  module msg {
+    struct Vector3 {
+      long double x;
+      long double y;
+      long double z;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/Quaternion
+
+module geometry_msgs {
+  module msg {
+    struct Quaternion {
+      long double x;
+      long double y;
+      long double z;
+      long double w;
+    };
+  };
+};
+
+================================================================================
+IDL: builtin_interfaces/Time
+// Normally added when generating idl schemas
+
+module builtin_interfaces {
+  struct Time {
+    int32 sec;
+    uint32 nsec;
+  };
+};
+    `;
+    const reader = new MessageReader(parseRos2idl(msgDef));
     const read = reader.readMessage(buffer);
 
     expect(read).toEqual({

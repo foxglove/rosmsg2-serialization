@@ -572,10 +572,10 @@
   resolved "https://registry.yarnpkg.com/@foxglove/message-definition/-/message-definition-0.2.0.tgz#e31922e58e57d224717bcfbd20d3cbaad709dc6b"
   integrity sha512-IQHIGCvBZR8GIua9nEpS+hsMF3gm1bfbrrnjG0rgtcFBWiNuKbzx4vIP8OIwDC+8wtwcFdfJhf4Vp5TPFiUUcQ==
 
-"@foxglove/rosmsg@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@foxglove/rosmsg/-/rosmsg-4.0.0.tgz#b0f1b57db4bfe2ea00f1d5904caeedb2d13bccb0"
-  integrity sha512-MuTAcA4U+wzlhUIHYgfBrjTDE/kzukWmhyI8suKgmjlnVjrpyzDNiMYsV5lU0KTW6noGKtqu46ZtxWSEWsOsEg==
+"@foxglove/rosmsg@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@foxglove/rosmsg/-/rosmsg-4.2.0.tgz#c3925a4f652ae0e27ec17785ba131eda1709465a"
+  integrity sha512-5cuY35jW7HRNjKIok/ohjvo8YJhE1OOecbBWHFsGzMvOrc5uo9q/9/2iFvhyFD+/j/ArwuNmWopME2jWiJZzvA==
   dependencies:
     "@foxglove/message-definition" "^0.2.0"
     md5-typescript "^1.0.5"
