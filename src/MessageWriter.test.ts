@@ -1,6 +1,7 @@
 import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
 
 import { MessageWriter } from "./MessageWriter";
+import { MessageReader } from "./MessageReader";
 
 const serializeString = (str: string): Uint8Array => {
   const data = Buffer.from(str, "utf8");
@@ -479,6 +480,391 @@ module builtin_interfaces {
       ],
     };
     const written = writer.writeMessage(message);
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
+  it("should write ros2idl tf2_msg/TF static", () => {
+    // same buffer as above
+    const expected = Uint8Array.from(
+      Buffer.from(
+        "010100000093d68c366e374d1700010000387b75620e3ec5391b00000063616d6572615f636f6c6f725f6f70746963616c5f6672616d650000e0010000800200000a000000706c756d625f626f62000000050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000801df482400000000000000000000000607d777440000000000000000000000060f9ea824000000060e0866e4000000000000000000000000000000000000000000000f03f000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f000000801df482400000000000000000000000607d7774400000000000000000000000000000000000000060f9ea824000000060e0866e40000000000000000000000000000000000000000000000000000000000000f03f000000000000000000000000000000000000000000000000000000000000000000000000",
+        "hex",
+      ),
+    );
+    const msgDef = `
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from tf2_msgs/msg/TFMessage.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/TransformStamped.idl"
+
+module tf2_msgs {
+  module msg {
+    struct TFMessage {
+      sequence<geometry_msgs::msg::TransformStamped> transforms;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/TransformStamped
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from geometry_msgs/msg/TransformStamped.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Transform.idl"
+#include "std_msgs/msg/Header.idl"
+
+module geometry_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      " This expresses a transform from coordinate frame header.frame_id" ""
+      " to the coordinate frame child_frame_id at the time of header.stamp" ""
+      "" ""
+      " This message is mostly used by the" ""
+      " <a href=\\"https://index.ros.org/p/tf2/\\">tf2</a> package." ""
+      " See its documentation for more information." ""
+      "" ""
+      " The child_frame_id is necessary in addition to the frame_id" ""
+      " in the Header to communicate the full reference for the transform" ""
+      " in a self contained message.")
+    struct TransformStamped {
+      @verbatim (language="comment", text=
+        " The frame id in the header is used as the reference frame of this transform.")
+      std_msgs::msg::Header header;
+
+      @verbatim (language="comment", text=
+        " The frame id of the child frame to which this transform points.")
+      string child_frame_id;
+
+      @verbatim (language="comment", text=
+        " Translation and rotation in 3-dimensions of child_frame_id from header.frame_id.")
+      geometry_msgs::msg::Transform transform;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/Transform
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from geometry_msgs/msg/Transform.msg
+// generated code does not contain a copyright notice
+
+#include "geometry_msgs/msg/Quaternion.idl"
+#include "geometry_msgs/msg/Vector3.idl"
+
+module geometry_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      " This represents the transform between two coordinate frames in free space.")
+    struct Transform {
+      geometry_msgs::msg::Vector3 translation;
+
+      geometry_msgs::msg::Quaternion rotation;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/Quaternion
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from geometry_msgs/msg/Quaternion.msg
+// generated code does not contain a copyright notice
+
+
+module geometry_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      " This represents an orientation in free space in quaternion form.")
+    struct Quaternion {
+      @default (value=0.0)
+      double x;
+
+      @default (value=0.0)
+      double y;
+
+      @default (value=0.0)
+      double z;
+
+      @default (value=1.0)
+      double w;
+    };
+  };
+};
+
+================================================================================
+IDL: geometry_msgs/msg/Vector3
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from geometry_msgs/msg/Vector3.msg
+// generated code does not contain a copyright notice
+
+
+module geometry_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      " This represents a vector in free space.")
+    struct Vector3 {
+      @verbatim (language="comment", text=
+        " This is semantically different than a point." "
+"
+        " A vector is always anchored at the origin." "
+"
+        " When a transform is applied to a vector, only the rotational component is applied.")
+      double x;
+
+      double y;
+
+      double z;
+    };
+  };
+};
+
+================================================================================
+IDL: std_msgs/msg/Header
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from std_msgs/msg/Header.msg
+// generated code does not contain a copyright notice
+
+#include "builtin_interfaces/msg/Time.idl"
+
+module std_msgs {
+  module msg {
+    @verbatim (language="comment", text=
+      " Standard metadata for higher-level stamped data types." "
+"
+      " This is generally used to communicate timestamped data" "
+"
+      " in a particular coordinate frame.")
+    struct Header {
+      @verbatim (language="comment", text=
+        " Two-integer timestamp that is expressed as seconds and nanoseconds.")
+      builtin_interfaces::msg::Time stamp;
+
+      @verbatim (language="comment", text=
+        " Transform frame with which this data is associated.")
+      string frame_id;
+    };
+  };
+};
+
+================================================================================
+IDL: builtin_interfaces/msg/Time
+// generated from rosidl_adapter/resource/msg.idl.em
+// with input from builtin_interfaces/msg/Time.msg
+// generated code does not contain a copyright notice
+
+
+module builtin_interfaces {
+  module msg {
+    @verbatim (language="comment", text=
+      " This message communicates ROS Time defined here:" ""
+      "https://design.ros2.org/articles/clock_and_time.html")
+    struct Time {
+      @verbatim (language="comment", text=
+        " The seconds component, valid over all int32 values.")
+      int32 sec;
+
+      @verbatim (language="comment", text=
+        " The nanoseconds component, valid in the range [0, 10e9).")
+      uint32 nanosec;
+    };
+  };
+};
+
+    `;
+
+    const message = {
+      transforms: [
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_link",
+          },
+          child_frame_id: "camera_depth_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: 0,
+              y: 0,
+              z: 0,
+              w: 1,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_depth_frame",
+          },
+          child_frame_id: "camera_depth_optical_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: -0.5,
+              y: 0.4999999999999999,
+              z: -0.5,
+              w: 0.5000000000000001,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_link",
+          },
+          child_frame_id: "camera_color_frame",
+          transform: {
+            translation: {
+              x: 0.000024338871298823506,
+              y: -0.015031411312520504,
+              z: 0.00011014656047336757,
+            },
+            rotation: {
+              x: 0.0022579776123166084,
+              y: -0.0012423135340213776,
+              z: 0.003848147578537464,
+              w: 0.9999892711639404,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_color_frame",
+          },
+          child_frame_id: "camera_color_optical_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: -0.5,
+              y: 0.4999999999999999,
+              z: -0.5,
+              w: 0.5000000000000001,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_link",
+          },
+          child_frame_id: "camera_infra1_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: 0,
+              y: 0,
+              z: 0,
+              w: 1,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_infra1_frame",
+          },
+          child_frame_id: "camera_infra1_optical_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: -0.5,
+              y: 0.4999999999999999,
+              z: -0.5,
+              w: 0.5000000000000001,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_link",
+          },
+          child_frame_id: "camera_infra2_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0.05013136938214302,
+              z: 0,
+            },
+            rotation: {
+              x: 0,
+              y: 0,
+              z: 0,
+              w: 1,
+            },
+          },
+        },
+        {
+          header: {
+            stamp: {
+              sec: 1651866405,
+              nsec: 16694470,
+            },
+            frame_id: "camera_infra2_frame",
+          },
+          child_frame_id: "camera_infra2_optical_frame",
+          transform: {
+            translation: {
+              x: 0,
+              y: 0,
+              z: 0,
+            },
+            rotation: {
+              x: -0.5,
+              y: 0.4999999999999999,
+              z: -0.5,
+              w: 0.5000000000000001,
+            },
+          },
+        },
+      ],
+    };
+    const writer = new MessageWriter(parseRos2idl(msgDef));
+    const written = writer.writeMessage(message);
+    const reader = new MessageReader(parseRos2idl(msgDef));
+    expect(reader.readMessage(written)).toEqual(message);
     expect(written).toBytesEqual(expected);
     expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });

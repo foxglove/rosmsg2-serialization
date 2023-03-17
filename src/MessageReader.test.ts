@@ -685,4 +685,42 @@ module builtin_interfaces {
       ],
     });
   });
+  it("should deserialize ros2msg tf2_msg/TF static", () => {
+    // same buffer as above
+    const buffer = Uint8Array.from(
+      Buffer.from(
+        "010100000093d68c366e374d1700010000387b75620e3ec5391b00000063616d6572615f636f6c6f725f6f70746963616c5f6672616d650000e0010000800200000a000000706c756d625f626f62000000050000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000801df482400000000000000000000000607d777440000000000000000000000060f9ea824000000060e0866e4000000000000000000000000000000000000000000000f03f000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f000000801df482400000000000000000000000607d7774400000000000000000000000000000000000000060f9ea824000000060e0866e40000000000000000000000000000000000000000000000000000000000000f03f000000000000000000000000000000000000000000000000000000000000000000000000",
+        "hex",
+      ),
+    );
+    const msgDef = `
+    MSG: geometry_msgs/msg/TransformStamped
+    Header header
+    string child_frame_id # the frame id of the child frame
+    Transform transform
+    ================================================================================
+    MSG: std_msgs/msg/Header
+    time stamp
+    string frame_id
+    ================================================================================
+    MSG: geometry_msgs/msg/Transform
+    Vector3 translation
+    Quaternion rotation
+    ================================================================================
+    MSG: geometry_msgs/msg/Vector3
+    float64 x
+    float64 y
+    float64 z
+    ================================================================================
+    MSG: geometry_msgs/msg/Quaternion
+    float64 x
+    float64 y
+    float64 z
+    float64 w
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toMatchSnapshot();
+  });
 });
