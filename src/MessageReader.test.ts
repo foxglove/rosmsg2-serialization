@@ -426,9 +426,9 @@ IDL: geometry_msgs/msg/Vector3
 module geometry_msgs {
   module msg {
     struct Vector3 {
-      long double x;
-      long double y;
-      long double z;
+      double x;
+      double y;
+      double z;
     };
   };
 };
@@ -439,10 +439,10 @@ IDL: geometry_msgs/msg/Quaternion
 module geometry_msgs {
   module msg {
     struct Quaternion {
-      long double x;
-      long double y;
-      long double z;
-      long double w;
+      double x;
+      double y;
+      double z;
+      double w;
     };
   };
 };
@@ -454,7 +454,7 @@ IDL: builtin_interfaces/Time
 module builtin_interfaces {
   struct Time {
     int32 sec;
-    uint32 nsec;
+    uint32 nanosec;
   };
 };
     `;
@@ -465,7 +465,7 @@ module builtin_interfaces {
       transforms: [
         {
           header: {
-            stamp: { sec: 1638821672, nsec: 836230505 },
+            stamp: { sec: 1638821672, nanosec: 836230505 },
             frame_id: "turtle1",
           },
           child_frame_id: "turtle1_ahead",
