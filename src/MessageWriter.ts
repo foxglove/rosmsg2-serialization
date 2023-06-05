@@ -102,6 +102,14 @@ export class MessageWriter {
     const messageObj = message as Record<string, unknown> | undefined;
     let newOffset = offset;
 
+    if (definition.length === 0) {
+      // In case a message definition definition is empty, ROS 2 adds a
+      // `uint8 structure_needs_at_least_one_member` field when converting to IDL,
+      // to satisfy the requirement from IDL of not being empty.
+      // See also https://design.ros2.org/articles/legacy_interface_definition.html
+      return offset + this.getPrimitiveSize("uint8");
+    }
+
     for (const field of definition) {
       if (field.isConstant === true) {
         continue;
@@ -167,6 +175,15 @@ export class MessageWriter {
 
   private write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
     const messageObj = message as Record<string, unknown> | undefined;
+
+    if (definition.length === 0) {
+      // In case a message definition definition is empty, ROS 2 adds a
+      // `uint8 structure_needs_at_least_one_member` field when converting to IDL,
+      // to satisfy the requirement from IDL of not being empty.
+      // See also https://design.ros2.org/articles/legacy_interface_definition.html
+      uint8(0, 0, writer);
+      return;
+    }
 
     for (const field of definition) {
       if (field.isConstant === true) {

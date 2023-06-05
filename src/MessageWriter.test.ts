@@ -482,4 +482,31 @@ module builtin_interfaces {
     expect(written).toBytesEqual(expected);
     expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });
+
+  it("should serialize an empty ROS 2 msg (e.g. std_msgs/msg/Empty)", () => {
+    const expected = Uint8Array.from(Buffer.from("0001000000", "hex"));
+    const msgDef = ``;
+    const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+    const message = {};
+    const written = writer.writeMessage(message);
+
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
+
+  it("should serialize a custom msg with a std_msgs/msg/Empty field", () => {
+    const expected = Uint8Array.from(Buffer.from("00010000000000007b000000", "hex"));
+    const msgDef = `
+    std_msgs/msg/Empty empty
+    int32 int_32_field
+    ================================================================================
+    MSG: std_msgs/msg/Empty
+    `;
+    const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+    const message = { int_32_field: 123 };
+    const written = writer.writeMessage(message);
+
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
 });

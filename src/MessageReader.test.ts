@@ -477,4 +477,27 @@ module builtin_interfaces {
       ],
     });
   });
+
+  it("should deserialize an empty ROS 2 msg (e.g. std_msgs/msg/Empty)", () => {
+    const buffer = Uint8Array.from(Buffer.from("0001000000", "hex"));
+    const msgDef = ``;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({});
+  });
+
+  it("should deserialize a custom msg with a std_msgs/msg/Empty field", () => {
+    const buffer = Uint8Array.from(Buffer.from("00010000000000007b000000", "hex"));
+    const msgDef = `
+    std_msgs/msg/Empty empty
+    int32 int_32_field
+    ================================================================================
+    MSG: std_msgs/msg/Empty
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({ empty: {}, int_32_field: 123 });
+  });
 });
