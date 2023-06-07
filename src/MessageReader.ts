@@ -48,6 +48,16 @@ export class MessageReader<T = unknown> {
     reader: CdrReader,
   ): Record<string, unknown> {
     const msg: Record<string, unknown> = {};
+
+    if (definition.length === 0) {
+      // In case a message definition definition is empty, ROS 2 adds a
+      // `uint8 structure_needs_at_least_one_member` field when converting to IDL,
+      // to satisfy the requirement from IDL of not being empty.
+      // See also https://design.ros2.org/articles/legacy_interface_definition.html
+      reader.uint8();
+      return msg;
+    }
+
     for (const field of definition) {
       if (field.isConstant === true) {
         continue;
