@@ -1,3 +1,4 @@
+import { MessageDefinition } from "@foxglove/message-definition";
 import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
 
 import { MessageReader } from "./MessageReader";
@@ -499,5 +500,28 @@ module builtin_interfaces {
     const read = reader.readMessage(buffer);
 
     expect(read).toEqual({ empty: {}, int_32_field: 123 });
+  });
+
+  it.each([
+    [
+      `time`,
+      `builtin_interfaces/Time`,
+      `builtin_interfaces/msg/Time`,
+      `duration`,
+      `builtin_interfaces/Duration`,
+      `builtin_interfaces/msg/Duration`,
+    ],
+  ])("should deserialize time/duration primitive %s", (timePrimitive: string) => {
+    const arr = [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00];
+    const buffer = Uint8Array.from([0, 1, 0, 0, ...arr]);
+    const expected = { stamp: { sec: 0, nsec: 1 } };
+    const msgDefs: MessageDefinition[] = [
+      {
+        definitions: [{ name: "stamp", type: timePrimitive, isComplex: false }],
+      },
+    ];
+    const reader = new MessageReader(msgDefs);
+    const read = reader.readMessage(buffer);
+    expect(read).toEqual(expected);
   });
 });

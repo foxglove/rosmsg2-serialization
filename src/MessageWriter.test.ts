@@ -1,3 +1,4 @@
+import { MessageDefinition } from "@foxglove/message-definition";
 import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
 
 import { MessageWriter } from "./MessageWriter";
@@ -506,6 +507,29 @@ module builtin_interfaces {
     const message = { int_32_field: 123 };
     const written = writer.writeMessage(message);
 
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
+
+  it.each([
+    [
+      `time`,
+      `builtin_interfaces/Time`,
+      `builtin_interfaces/msg/Time`,
+      `duration`,
+      `builtin_interfaces/Duration`,
+      `builtin_interfaces/msg/Duration`,
+    ],
+  ])("should serialize time/duration primitive %s", (timePrimitive: string) => {
+    const expected = Uint8Array.from(Buffer.from("00010000fb65865e80faae06", "hex"));
+    const msgDefs: MessageDefinition[] = [
+      {
+        definitions: [{ name: "stamp", type: timePrimitive, isComplex: false }],
+      },
+    ];
+    const writer = new MessageWriter(msgDefs);
+    const message = { stamp: { sec: 1585866235, nsec: 112130688 } };
+    const written = writer.writeMessage(message);
     expect(written).toBytesEqual(expected);
     expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });

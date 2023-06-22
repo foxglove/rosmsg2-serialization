@@ -104,6 +104,8 @@ export class MessageReader<T = unknown> {
   }
 }
 
+const timeDeserializer: Deserializer = (reader) => ({ sec: reader.int32(), nsec: reader.uint32() });
+
 const deserializers = new Map<string, Deserializer>([
   ["bool", (reader) => Boolean(reader.int8())],
   ["int8", (reader) => reader.int8()],
@@ -117,8 +119,12 @@ const deserializers = new Map<string, Deserializer>([
   ["float32", (reader) => reader.float32()],
   ["float64", (reader) => reader.float64()],
   ["string", (reader) => reader.string()],
-  ["time", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
-  ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
+  ["time", timeDeserializer],
+  ["builtin_interfaces/Time", timeDeserializer],
+  ["builtin_interfaces/msg/Time", timeDeserializer],
+  ["duration", timeDeserializer],
+  ["builtin_interfaces/Duration", timeDeserializer],
+  ["builtin_interfaces/msg/Duration", timeDeserializer],
 ]);
 
 const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
@@ -135,7 +141,11 @@ const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
   ["float64", (reader, count) => reader.float64Array(count)],
   ["string", readStringArray],
   ["time", readTimeArray],
+  ["builtin_interfaces/Time", readTimeArray],
+  ["builtin_interfaces/msg/Time", readTimeArray],
   ["duration", readTimeArray],
+  ["builtin_interfaces/Duration", readTimeArray],
+  ["builtin_interfaces/msg/Duration", readTimeArray],
 ]);
 
 function readBoolArray(reader: CdrReader, count: number): boolean[] {

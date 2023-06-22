@@ -39,7 +39,11 @@ const PRIMITIVE_WRITERS = new Map<string, PrimitiveWriter>([
   ["float64", float64],
   ["string", string],
   ["time", time],
+  ["builtin_interfaces/Time", time],
+  ["builtin_interfaces/msg/Time", time],
   ["duration", time],
+  ["builtin_interfaces/Duration", time],
+  ["builtin_interfaces/msg/Duration", time],
 ]);
 
 const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
@@ -56,7 +60,11 @@ const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
   ["float64", float64Array],
   ["string", stringArray],
   ["time", timeArray],
+  ["builtin_interfaces/Time", timeArray],
+  ["builtin_interfaces/msg/Time", timeArray],
   ["duration", timeArray],
+  ["builtin_interfaces/Duration", timeArray],
+  ["builtin_interfaces/msg/Duration", timeArray],
 ]);
 
 /**
