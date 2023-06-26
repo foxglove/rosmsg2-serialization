@@ -68,7 +68,8 @@ export class MessageWriter {
   definitions: Map<string, MessageDefinitionField[]>;
 
   constructor(definitions: MessageDefinition[]) {
-    const rootDefinition = definitions[0];
+    // ros2idl modules could have constant modules before the root struct used to decode message
+    const rootDefinition = definitions.find((def) => !isConstantModule(def));
     if (rootDefinition == undefined) {
       throw new Error("MessageReader initialized with no root MessageDefinition");
     }
@@ -260,6 +261,10 @@ export class MessageWriter {
     }
     return writer;
   }
+}
+
+function isConstantModule(def: MessageDefinition): boolean {
+  return def.definitions.length > 0 && def.definitions.every((field) => field.isConstant);
 }
 
 function fieldLength(value: unknown): number {

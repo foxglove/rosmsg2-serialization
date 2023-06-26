@@ -500,4 +500,24 @@ module builtin_interfaces {
 
     expect(read).toEqual({ empty: {}, int_32_field: 123 });
   });
+
+  it("ros2idl should choose non-constant root definition", () => {
+    const data = [0x02];
+    const buffer = Uint8Array.from([0, 1, 0, 0, ...data]);
+    const msgDef = `
+    module a {
+      module b {
+        const int8 STATUS_ONE = 1;
+        const int8 STATUS_TWO = 2;
+      };
+      struct c {
+       int8 status;
+      };
+    };
+    `;
+    const reader = new MessageReader(parseRos2idl(msgDef));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({ status: 2 });
+  });
 });

@@ -509,4 +509,28 @@ module builtin_interfaces {
     expect(written).toBytesEqual(expected);
     expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });
+
+  it("ros2idl should choose non-constant root definition", () => {
+    const message = { status: 2 };
+    const messageBin = [0x02];
+    const msgDef = `
+    module a {
+      module b {
+        const int8 STATUS_ONE = 1;
+        const int8 STATUS_TWO = 2;
+      };
+      struct c {
+       int8 status;
+      };
+    };
+    `;
+
+    const expected = Uint8Array.from([0, 1, 0, 0, ...messageBin]);
+
+    const writer = new MessageWriter(parseRos2idl(msgDef));
+    const written = writer.writeMessage(message);
+
+    expect(written).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
 });
