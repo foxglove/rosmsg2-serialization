@@ -553,10 +553,10 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.35.0.tgz#b7569632b0b788a0ca0e438235154e45d42813a7"
   integrity sha512-JXdzbRiWclLVoD8sNUjR443VVlYqiYmDVT6rGUEIEHU5YJW0gaVZwV2xgM7D4arkvASqD0IlLUVjHiFuxaftRw==
 
-"@foxglove/cdr@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@foxglove/cdr/-/cdr-2.0.0.tgz#12bade26e1525e522fc9f0366830e65e5cb52e27"
-  integrity sha512-Zu00eJyO05bX9js7/E2QfQNjG8p7jNhE/vUuTF2lO+MS89/kLDb/b6fle8krLy7Bnd7ClKv6G4JAmiqy6wKwEA==
+"@foxglove/cdr@^3.0.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@foxglove/cdr/-/cdr-3.1.0.tgz#ab1013102b841f2677935dbd5a22437dfd190400"
+  integrity sha512-odE1WW8KZlvU0ia/VG99I0cUFN7gikv/8eDO03GAGZM673opSWyL4QFC2mewFTaN1/PydHxTXuJESllcgieyfw==
 
 "@foxglove/eslint-plugin@0.21.0":
   version "0.21.0"
