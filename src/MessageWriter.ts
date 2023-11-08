@@ -5,8 +5,18 @@ import {
   MessageDefinitionField,
 } from "@foxglove/message-definition";
 
-type PrimitiveWriter = (value: unknown, defaultValue: DefaultValue, writer: CdrWriter) => void;
-type PrimitiveArrayWriter = (value: unknown, defaultValue: DefaultValue, writer: CdrWriter) => void;
+type PrimitiveWriter = (
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+) => void;
+type PrimitiveArrayWriter = (
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arraySize?: number,
+) => void;
 
 const PRIMITIVE_SIZES = new Map<string, number>([
   ["bool", 1],
@@ -203,6 +213,15 @@ export class MessageWriter {
           writer.sequenceLength(arrayLength);
         }
 
+        if (field.arrayLength != undefined && nestedMessage != undefined) {
+          const givenFieldLength = fieldLength(nestedMessage);
+          if (givenFieldLength !== field.arrayLength) {
+            throw new Error(
+              `Given array does not match the defined array size: ${givenFieldLength} != ${field.arrayLength}`,
+            );
+          }
+        }
+
         if (field.isComplex === true) {
           // Complex type array
           const nestedDefinition = this.getDefinition(field.type);
@@ -213,7 +232,7 @@ export class MessageWriter {
         } else {
           // Primitive array
           const arrayWriter = this.getPrimitiveArrayWriter(field.type);
-          arrayWriter(nestedMessage, field.defaultValue, writer);
+          arrayWriter(nestedMessage, field.defaultValue, writer, field.arrayLength);
         }
       } else {
         if (field.isComplex === true) {
@@ -344,27 +363,42 @@ function time(value: unknown, _defaultValue: DefaultValue, writer: CdrWriter): v
   writer.uint32(timeObj.nsec ?? timeObj.nanosec ?? 0);
 }
 
-function boolArray(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function boolArray(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (Array.isArray(value)) {
     const array = new Int8Array(value);
     writer.int8Array(array);
   } else {
-    writer.int8Array((defaultValue ?? []) as number[]);
+    writer.int8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function int8Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function int8Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Int8Array) {
     writer.int8Array(value);
   } else if (Array.isArray(value)) {
     const array = new Int8Array(value);
     writer.int8Array(array);
   } else {
-    writer.int8Array((defaultValue ?? []) as number[]);
+    writer.int8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function uint8Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function uint8Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Uint8Array) {
     writer.uint8Array(value);
   } else if (value instanceof Uint8ClampedArray) {
@@ -373,112 +407,162 @@ function uint8Array(value: unknown, defaultValue: DefaultValue, writer: CdrWrite
     const array = new Uint8Array(value);
     writer.uint8Array(array);
   } else {
-    writer.uint8Array((defaultValue ?? []) as number[]);
+    writer.uint8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function int16Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function int16Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Int16Array) {
     writer.int16Array(value);
   } else if (Array.isArray(value)) {
     const array = new Int16Array(value);
     writer.int16Array(array);
   } else {
-    writer.int16Array((defaultValue ?? []) as number[]);
+    writer.int16Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function uint16Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function uint16Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Uint16Array) {
     writer.uint16Array(value);
   } else if (Array.isArray(value)) {
     const array = new Uint16Array(value);
     writer.uint16Array(array);
   } else {
-    writer.uint16Array((defaultValue ?? []) as number[]);
+    writer.uint16Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function int32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function int32Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Int32Array) {
     writer.int32Array(value);
   } else if (Array.isArray(value)) {
     const array = new Int32Array(value);
     writer.int32Array(array);
   } else {
-    writer.int32Array((defaultValue ?? []) as number[]);
+    writer.int32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function uint32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function uint32Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Uint32Array) {
     writer.uint32Array(value);
   } else if (Array.isArray(value)) {
     const array = new Uint32Array(value);
     writer.uint32Array(array);
   } else {
-    writer.uint32Array((defaultValue ?? []) as number[]);
+    writer.uint32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function int64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function int64Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof BigInt64Array) {
     writer.int64Array(value);
   } else if (Array.isArray(value)) {
     const array = new BigInt64Array(value);
     writer.int64Array(array);
   } else {
-    writer.int64Array((defaultValue ?? []) as bigint[]);
+    writer.int64Array((defaultValue ?? new Array(arrayLength).fill(0n)) as bigint[]);
   }
 }
 
-function uint64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function uint64Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof BigUint64Array) {
     writer.uint64Array(value);
   } else if (Array.isArray(value)) {
     const array = new BigUint64Array(value);
     writer.uint64Array(array);
   } else {
-    writer.uint64Array((defaultValue ?? []) as bigint[]);
+    writer.uint64Array((defaultValue ?? new Array(arrayLength).fill(0n)) as bigint[]);
   }
 }
 
-function float32Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function float32Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Float32Array) {
     writer.float32Array(value);
   } else if (Array.isArray(value)) {
     const array = new Float32Array(value);
     writer.float32Array(array);
   } else {
-    writer.float32Array((defaultValue ?? []) as number[]);
+    writer.float32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function float64Array(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function float64Array(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (value instanceof Float64Array) {
     writer.float64Array(value);
   } else if (Array.isArray(value)) {
     const array = new Float64Array(value);
     writer.float64Array(array);
   } else {
-    writer.float64Array((defaultValue ?? []) as number[]);
+    writer.float64Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
   }
 }
 
-function stringArray(value: unknown, defaultValue: DefaultValue, writer: CdrWriter): void {
+function stringArray(
+  value: unknown,
+  defaultValue: DefaultValue,
+  writer: CdrWriter,
+  arrayLength?: number,
+): void {
   if (Array.isArray(value)) {
     for (const item of value) {
       writer.string(typeof item === "string" ? item : "");
     }
   } else {
-    const array = (defaultValue ?? []) as string[];
+    const array = (defaultValue ?? new Array(arrayLength).fill("")) as string[];
     for (const item of array) {
       writer.string(item);
     }
   }
 }
 
-function timeArray(value: unknown, _defaultValue: DefaultValue, writer: CdrWriter): void {
+function timeArray(
+  value: unknown,
+  _defaultValue: DefaultValue,
+  writer: CdrWriter,
+  _arrayLength?: number,
+): void {
   if (Array.isArray(value)) {
     for (const item of value) {
       time(item, undefined, writer);

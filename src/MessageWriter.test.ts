@@ -533,4 +533,43 @@ module builtin_interfaces {
     expect(written).toBytesEqual(expected);
     expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
   });
+
+  it("should default initialize a fixed-length array", () => {
+    const msgDef: MessageDefinition[] = [
+      {
+        definitions: [
+          {
+            type: "float64",
+            name: "array",
+            isArray: true,
+            arrayLength: 10,
+          },
+        ],
+      },
+    ];
+    const msgWriter = new MessageWriter(msgDef);
+    const written = msgWriter.writeMessage({});
+    expect(written.byteLength).toEqual(84);
+  });
+
+  it("should throw when writing an array with wrong size to fixed-length array", () => {
+    const msgDef: MessageDefinition[] = [
+      {
+        definitions: [
+          {
+            type: "float64",
+            name: "array",
+            isArray: true,
+            arrayLength: 10,
+          },
+        ],
+      },
+    ];
+    const msgWriter = new MessageWriter(msgDef);
+    expect(() => msgWriter.writeMessage({ array: [] })).toThrow();
+    expect(() => msgWriter.writeMessage({ array: new Float64Array() })).toThrow();
+    expect(() => msgWriter.writeMessage({ array: new Float64Array(5) })).toThrow();
+    expect(() => msgWriter.writeMessage({ array: new Float64Array(10) })).not.toThrow();
+    expect(() => msgWriter.writeMessage({ array: new Array(10).fill(0) })).not.toThrow();
+  });
 });
