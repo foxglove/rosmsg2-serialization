@@ -535,7 +535,7 @@ module builtin_interfaces {
   });
 
   it("should default initialize a fixed-length array", () => {
-    const msgDef: MessageDefinition[] = [
+    const msgDef = [
       {
         definitions: [
           {
@@ -553,7 +553,7 @@ module builtin_interfaces {
   });
 
   it("should throw when writing an array with wrong size to fixed-length array", () => {
-    const msgDef: MessageDefinition[] = [
+    const msgDef = [
       {
         definitions: [
           {
