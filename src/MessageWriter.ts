@@ -217,7 +217,7 @@ export class MessageWriter {
           const givenFieldLength = fieldLength(nestedMessage);
           if (givenFieldLength !== field.arrayLength) {
             throw new Error(
-              `Given array does not match the defined array size: ${givenFieldLength} != ${field.arrayLength}`,
+              `Expected ${field.arrayLength} items for fixed-length array field ${field.name} but received ${givenFieldLength}`,
             );
           }
         }
@@ -561,10 +561,15 @@ function timeArray(
   value: unknown,
   _defaultValue: DefaultValue,
   writer: CdrWriter,
-  _arrayLength?: number,
+  arrayLength?: number,
 ): void {
   if (Array.isArray(value)) {
     for (const item of value) {
+      time(item, undefined, writer);
+    }
+  } else {
+    const array = new Array(arrayLength).fill(undefined) as undefined[];
+    for (const item of array) {
       time(item, undefined, writer);
     }
   }
