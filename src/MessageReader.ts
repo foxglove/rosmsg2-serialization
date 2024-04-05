@@ -1,5 +1,6 @@
 import { CdrReader } from "@foxglove/cdr";
 import { MessageDefinition, MessageDefinitionField } from "@foxglove/message-definition";
+
 import { Time } from "./types";
 
 export type Deserializer = (reader: CdrReader) => boolean | number | bigint | string | Time;
