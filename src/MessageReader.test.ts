@@ -57,7 +57,7 @@ describe("MessageReader", () => {
       {
         stamp: {
           sec: 0,
-          nsec: 1,
+          nanosec: 1,
         },
       },
     ],
@@ -67,7 +67,7 @@ describe("MessageReader", () => {
       {
         stamp: {
           sec: 0,
-          nsec: 1,
+          nanosec: 1,
         },
       },
     ],
@@ -82,22 +82,22 @@ describe("MessageReader", () => {
     [
       `time[1] arr`,
       [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 1, nsec: 2 }] },
+      { arr: [{ sec: 1, nanosec: 2 }] },
     ],
     [
       `duration[1] arr`,
       [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 1, nsec: 2 }] },
+      { arr: [{ sec: 1, nanosec: 2 }] },
     ],
     [
       `time[] arr`,
       [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 2, nsec: 3 }] },
+      { arr: [{ sec: 2, nanosec: 3 }] },
     ],
     [
       `duration[] arr`,
       [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 2, nsec: 3 }] },
+      { arr: [{ sec: 2, nanosec: 3 }] },
     ],
     // unaligned access
     [
@@ -117,7 +117,7 @@ describe("MessageReader", () => {
         ...[0x00, 0x00, 0x00], // alignment
         ...[0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
       ],
-      { blank: 0, arr: [{ sec: 2, nsec: 3 }] },
+      { blank: 0, arr: [{ sec: 2, nanosec: 3 }] },
     ],
     [`float32[2] arr`, float32Buffer([5.5, 6.5]), { arr: Float32Array.from([5.5, 6.5]) }],
     [
@@ -303,7 +303,7 @@ describe("MessageReader", () => {
     const read = reader.readMessage(buffer);
 
     expect(read).toEqual({
-      stamp: { sec: 1585866235, nsec: 112130688 },
+      stamp: { sec: 1585866235, nanosec: 112130688 },
       level: 20,
       name: "minimal_publisher",
       msg: "Publishing: 'Hello, world! 0'",
@@ -354,7 +354,7 @@ describe("MessageReader", () => {
       transforms: [
         {
           header: {
-            stamp: { sec: 1638821672, nsec: 836230505 },
+            stamp: { sec: 1638821672, nanosec: 836230505 },
             frame_id: "turtle1",
           },
           child_frame_id: "turtle1_ahead",
