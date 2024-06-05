@@ -125,6 +125,7 @@ const deserializers = new Map<string, Deserializer>([
   ["string", (reader) => reader.string()],
   ["time", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
   ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
+  ["wstring", throwOnWstring],
 ]);
 
 const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
@@ -142,6 +143,7 @@ const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
   ["string", readStringArray],
   ["time", readTimeArray],
   ["duration", readTimeArray],
+  ["wstring", throwOnWstring],
 ]);
 
 function readBoolArray(reader: CdrReader, count: number): boolean[] {
@@ -168,4 +170,8 @@ function readTimeArray(reader: CdrReader, count: number): Time[] {
     array[i] = { sec, nsec };
   }
   return array;
+}
+
+function throwOnWstring(): never {
+  throw new Error("wstring is implementation-defined and therefore not supported");
 }

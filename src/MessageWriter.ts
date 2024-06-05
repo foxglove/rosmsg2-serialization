@@ -50,6 +50,7 @@ const PRIMITIVE_WRITERS = new Map<string, PrimitiveWriter>([
   ["string", string],
   ["time", time],
   ["duration", time],
+  ["wstring", throwOnWstring],
 ]);
 
 const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
@@ -67,7 +68,12 @@ const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
   ["string", stringArray],
   ["time", timeArray],
   ["duration", timeArray],
+  ["wstring", throwOnWstring],
 ]);
+
+function throwOnWstring(): never {
+  throw new Error("wstring is implementation-defined and therefore not supported");
+}
 
 /**
  * Takes a parsed message definition and returns a message writer which
@@ -260,6 +266,9 @@ export class MessageWriter {
   private getPrimitiveSize(primitiveType: string) {
     const size = PRIMITIVE_SIZES.get(primitiveType);
     if (size == undefined) {
+      if (primitiveType === "wstring") {
+        throwOnWstring();
+      }
       throw new Error(`Unrecognized primitive type ${primitiveType}`);
     }
     return size;

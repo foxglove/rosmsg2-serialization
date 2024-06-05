@@ -520,4 +520,16 @@ module builtin_interfaces {
 
     expect(read).toEqual({ status: 2 });
   });
+
+  it.each(["wstring field", "wstring[] field"])(
+    "should throw exepction when encountering wstring fields",
+    (msgDef) => {
+      const buffer = Uint8Array.from(Buffer.from("00010000000000007b000000", "hex"));
+      const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+
+      expect(() => reader.readMessage(buffer)).toThrow(
+        "wstring is implementation-defined and therefore not supported",
+      );
+    },
+  );
 });

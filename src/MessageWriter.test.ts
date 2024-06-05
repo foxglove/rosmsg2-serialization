@@ -579,4 +579,26 @@ module builtin_interfaces {
     expect(() => msgWriter.writeMessage({ array: new Float64Array(10) })).not.toThrow();
     expect(() => msgWriter.writeMessage({ array: new Array(10).fill(0) })).not.toThrow();
   });
+
+  it.each([{ isArray: false }, { isArray: true, arrayLength: 10 }])(
+    "should throw exepction when encountering wstring fields",
+    (def) => {
+      const msgDef = [
+        {
+          definitions: [
+            {
+              type: "wstring",
+              name: "array",
+              ...def,
+            },
+          ],
+        },
+      ];
+
+      const msgWriter = new MessageWriter(msgDef);
+      expect(() => msgWriter.writeMessage({ array: [] })).toThrow(
+        "wstring is implementation-defined and therefore not supported",
+      );
+    },
+  );
 });
