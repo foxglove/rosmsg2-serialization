@@ -439,10 +439,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@foxglove/cdr@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "@foxglove/cdr@npm:3.1.0"
-  checksum: 10c0/1008bdf7e051822aad6a2c6caa0499c9e7c4b75ab83575b67ee5efef3f1b649baf84c9afb40c2cb8b9b0756e75363d165fee0294c3c0f3081eb2e9795e50270f
+"@foxglove/cdr@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "@foxglove/cdr@npm:3.3.0"
+  checksum: 10c0/8d24d4468509e6bda9bf8c79eff914a699b806fc7bbed2c517f9da87315c692a8c001f4c0a97cc747a2cf6af7232f3fe9596bbbb81c27b0dbfdf8cb226d01b22
   languageName: node
   linkType: hard
 
@@ -476,13 +476,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@foxglove/message-definition@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@foxglove/message-definition@npm:0.4.0"
+  checksum: 10c0/235db9d110cff442ebf2921d9c166a70ef6a7e2464228353fae5bf016ef0ba6a3e56c62af1620ba1e0430f184d3544ef99a8d9409f39c79f131cb4c0f4b63934
+  languageName: node
+  linkType: hard
+
 "@foxglove/rosmsg2-serialization@workspace:.":
   version: 0.0.0-use.local
   resolution: "@foxglove/rosmsg2-serialization@workspace:."
   dependencies:
-    "@foxglove/cdr": "npm:^3.0.0"
+    "@foxglove/cdr": "npm:^3.3.0"
     "@foxglove/eslint-plugin": "npm:2.0.0"
-    "@foxglove/message-definition": "npm:^0.2.0"
+    "@foxglove/message-definition": "npm:^0.4.0"
     "@foxglove/rosmsg": "npm:4.2.1"
     "@foxglove/rostime": "npm:^1.1.2"
     "@sounisi5011/jest-binary-data-matchers": "npm:1.2.1"
