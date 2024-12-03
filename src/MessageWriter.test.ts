@@ -1,4 +1,5 @@
-import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
+import { parseRos2idl } from "@foxglove/ros2idl-parser";
+import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
 
 import { MessageWriter } from "./MessageWriter";
 
@@ -322,27 +323,27 @@ describe("MessageWriter", () => {
       ),
     );
     const msgDef = `
-    geometry_msgs/msg/TransformStamped[] transforms
+    geometry_msgs/TransformStamped[] transforms
     ================================================================================
-    MSG: geometry_msgs/msg/TransformStamped
+    MSG: geometry_msgs/TransformStamped
     Header header
     string child_frame_id # the frame id of the child frame
     Transform transform
     ================================================================================
-    MSG: std_msgs/msg/Header
+    MSG: std_msgs/Header
     builtin_interfaces/Time stamp
     string frame_id
     ================================================================================
-    MSG: geometry_msgs/msg/Transform
+    MSG: geometry_msgs/Transform
     Vector3 translation
     Quaternion rotation
     ================================================================================
-    MSG: geometry_msgs/msg/Vector3
+    MSG: geometry_msgs/Vector3
     float64 x
     float64 y
     float64 z
     ================================================================================
-    MSG: geometry_msgs/msg/Quaternion
+    MSG: geometry_msgs/Quaternion
     float64 x
     float64 y
     float64 z
