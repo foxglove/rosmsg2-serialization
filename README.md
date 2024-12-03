@@ -14,6 +14,9 @@ import { MessageReader } from "@foxglove/rosmsg2-serialization";
 // message definition comes from `parse()` in @foxglove/rosmsg
 const reader = new MessageReader(messageDefinition);
 
+// specify a different `timeFormat` for time objects compatible with ROS 1 and @foxglove/rostime
+const reader = new MessageReader(messageDefinition, { timeFormat: "sec,nsec" });
+
 // deserialize a buffer into an object
 const message = reader.readMessage([0x00, 0x01, ...]);
 
