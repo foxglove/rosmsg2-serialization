@@ -440,9 +440,9 @@ __metadata:
   linkType: hard
 
 "@foxglove/cdr@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "@foxglove/cdr@npm:3.1.0"
-  checksum: 10c0/1008bdf7e051822aad6a2c6caa0499c9e7c4b75ab83575b67ee5efef3f1b649baf84c9afb40c2cb8b9b0756e75363d165fee0294c3c0f3081eb2e9795e50270f
+  version: 3.3.0
+  resolution: "@foxglove/cdr@npm:3.3.0"
+  checksum: 10c0/8d24d4468509e6bda9bf8c79eff914a699b806fc7bbed2c517f9da87315c692a8c001f4c0a97cc747a2cf6af7232f3fe9596bbbb81c27b0dbfdf8cb226d01b22
   languageName: node
   linkType: hard
 
