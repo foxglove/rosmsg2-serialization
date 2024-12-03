@@ -46,9 +46,9 @@ describe("MessageReader", () => {
     [`float32 sample`, float32Buffer([5.5]), { sample: 5.5 }],
     [
       `float64 sample`,
-      // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+      // eslint-disable-next-line no-loss-of-precision
       new Uint8Array(Float64Array.of(0.123456789121212121212).buffer),
-      // eslint-disable-next-line @typescript-eslint/no-loss-of-precision
+      // eslint-disable-next-line no-loss-of-precision
       { sample: 0.123456789121212121212 },
     ],
     [
@@ -823,4 +823,16 @@ module builtin_interfaces {
 
     expect(read).toEqual({ status: 2 });
   });
+
+  it.each(["wstring field", "wstring[] field"])(
+    "should throw exepction when encountering wstring fields",
+    (msgDef) => {
+      const buffer = Uint8Array.from(Buffer.from("00010000000000007b000000", "hex"));
+      const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+
+      expect(() => reader.readMessage(buffer)).toThrow(
+        "wstring is implementation-defined and therefore not supported",
+      );
+    },
+  );
 });

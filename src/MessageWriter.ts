@@ -50,6 +50,7 @@ const PRIMITIVE_WRITERS = new Map<string, PrimitiveWriter>([
   ["string", string],
   ["time", time],
   ["duration", time],
+  ["wstring", throwOnWstring],
 ]);
 
 const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
@@ -67,7 +68,12 @@ const PRIMITIVE_ARRAY_WRITERS = new Map<string, PrimitiveArrayWriter>([
   ["string", stringArray],
   ["time", timeArray],
   ["duration", timeArray],
+  ["wstring", throwOnWstring],
 ]);
+
+function throwOnWstring(): never {
+  throw new Error("wstring is implementation-defined and therefore not supported");
+}
 
 /**
  * Takes a parsed message definition and returns a message writer which
@@ -109,6 +115,7 @@ export class MessageWriter {
     return writer.data;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private byteSize(definition: MessageDefinitionField[], message: unknown, offset: number): number {
     const messageObj = message as Record<string, unknown> | undefined;
     let newOffset = offset;
@@ -184,6 +191,7 @@ export class MessageWriter {
     return newOffset;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
     const messageObj = message as Record<string, unknown> | undefined;
 
@@ -249,6 +257,7 @@ export class MessageWriter {
     }
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getDefinition(datatype: string) {
     const nestedDefinition = this.definitions.get(datatype);
     if (nestedDefinition == undefined) {
@@ -257,14 +266,19 @@ export class MessageWriter {
     return nestedDefinition;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveSize(primitiveType: string) {
     const size = PRIMITIVE_SIZES.get(primitiveType);
     if (size == undefined) {
+      if (primitiveType === "wstring") {
+        throwOnWstring();
+      }
       throw new Error(`Unrecognized primitive type ${primitiveType}`);
     }
     return size;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveWriter(primitiveType: string) {
     const writer = PRIMITIVE_WRITERS.get(primitiveType);
     if (writer == undefined) {
@@ -273,6 +287,7 @@ export class MessageWriter {
     return writer;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveArrayWriter(primitiveType: string) {
     const writer = PRIMITIVE_ARRAY_WRITERS.get(primitiveType);
     if (writer == undefined) {

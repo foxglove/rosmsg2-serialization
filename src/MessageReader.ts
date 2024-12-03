@@ -50,11 +50,13 @@ export class MessageReader<T = unknown> {
 
   // We template on R here for call site type information if the class type information T is not
   // known or available
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
   readMessage<R = T>(buffer: ArrayBufferView): R {
     const reader = new CdrReader(buffer);
     return this.readComplexType(this.rootDefinition, reader) as R;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private readComplexType(
     definition: MessageDefinitionField[],
     reader: CdrReader,
@@ -148,6 +150,7 @@ const deserializers = new Map<string, Deserializer>([
   ["ros2Time", (reader) => ({ sec: reader.int32(), nanosec: reader.uint32() })],
   ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
   ["ros2Duration", (reader) => ({ sec: reader.int32(), nanosec: reader.uint32() })],
+  ["wstring", throwOnWstring],
 ]);
 
 const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
@@ -167,6 +170,7 @@ const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
   ["ros2Time", readRos2TimeArray],
   ["duration", readTimeArray],
   ["ros2Duration", readRos2TimeArray],
+  ["wstring", throwOnWstring],
 ]);
 
 function readBoolArray(reader: CdrReader, count: number): boolean[] {
@@ -203,4 +207,8 @@ function readRos2TimeArray(reader: CdrReader, count: number): Ros2Time[] {
     array[i] = { sec, nanosec };
   }
   return array;
+}
+
+function throwOnWstring(): never {
+  throw new Error("wstring is implementation-defined and therefore not supported");
 }
