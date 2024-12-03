@@ -43,7 +43,7 @@
   },
   "devDependencies": {
     "@foxglove/eslint-plugin": "2.0.0",
-    "@foxglove/rosmsg": "4.2.1",
+    "@foxglove/rosmsg": "5.0.4",
     "@sounisi5011/jest-binary-data-matchers": "1.2.1",
     "@types/jest": "^29.4.0",
     "@types/prettier": "^3.0.0",
