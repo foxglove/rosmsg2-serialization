@@ -476,13 +476,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@foxglove/message-definition@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@foxglove/message-definition@npm:0.4.0"
+  checksum: 10c0/235db9d110cff442ebf2921d9c166a70ef6a7e2464228353fae5bf016ef0ba6a3e56c62af1620ba1e0430f184d3544ef99a8d9409f39c79f131cb4c0f4b63934
+  languageName: node
+  linkType: hard
+
 "@foxglove/rosmsg2-serialization@workspace:.":
   version: 0.0.0-use.local
   resolution: "@foxglove/rosmsg2-serialization@workspace:."
   dependencies:
     "@foxglove/cdr": "npm:^3.0.0"
     "@foxglove/eslint-plugin": "npm:2.0.0"
-    "@foxglove/message-definition": "npm:^0.2.0"
+    "@foxglove/message-definition": "npm:^0.4.0"
     "@foxglove/rosmsg": "npm:4.2.1"
     "@foxglove/rostime": "npm:^1.1.2"
     "@sounisi5011/jest-binary-data-matchers": "npm:1.2.1"
