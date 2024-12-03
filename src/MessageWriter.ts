@@ -115,6 +115,7 @@ export class MessageWriter {
     return writer.data;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private byteSize(definition: MessageDefinitionField[], message: unknown, offset: number): number {
     const messageObj = message as Record<string, unknown> | undefined;
     let newOffset = offset;
@@ -190,6 +191,7 @@ export class MessageWriter {
     return newOffset;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
     const messageObj = message as Record<string, unknown> | undefined;
 
@@ -255,6 +257,7 @@ export class MessageWriter {
     }
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getDefinition(datatype: string) {
     const nestedDefinition = this.definitions.get(datatype);
     if (nestedDefinition == undefined) {
@@ -263,6 +266,7 @@ export class MessageWriter {
     return nestedDefinition;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveSize(primitiveType: string) {
     const size = PRIMITIVE_SIZES.get(primitiveType);
     if (size == undefined) {
@@ -274,6 +278,7 @@ export class MessageWriter {
     return size;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveWriter(primitiveType: string) {
     const writer = PRIMITIVE_WRITERS.get(primitiveType);
     if (writer == undefined) {
@@ -282,6 +287,7 @@ export class MessageWriter {
     return writer;
   }
 
+  // eslint-disable-next-line @foxglove/prefer-hash-private
   private getPrimitiveArrayWriter(primitiveType: string) {
     const writer = PRIMITIVE_ARRAY_WRITERS.get(primitiveType);
     if (writer == undefined) {
