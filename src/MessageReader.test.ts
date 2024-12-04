@@ -276,7 +276,7 @@ describe("MessageReader", () => {
       { blank: 0, arr: [{ sec: 2, nsec: 3 }] },
     ],
   ])(
-    "should deserialize %s correctly based on specified time format",
+    "should deserialize %s correctly based on specified time type",
     (
       msgDef: string,
       arr: Iterable<number>,
@@ -291,13 +291,13 @@ describe("MessageReader", () => {
 
       expect(
         new MessageReader(parseMessageDefinition(msgDef, { ros2: true }), {
-          timeFormat: "sec,nanosec",
+          timeType: "sec,nanosec",
         }).readMessage(buffer),
       ).toEqual(expected);
 
       expect(
         new MessageReader(parseMessageDefinition(msgDef, { ros2: true }), {
-          timeFormat: "sec,nsec",
+          timeType: "sec,nsec",
         }).readMessage(buffer),
       ).toEqual(ros1Expected);
     },

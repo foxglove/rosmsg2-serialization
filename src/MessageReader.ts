@@ -29,13 +29,13 @@ type ArrayDeserializer = (
 
 export type MessageReaderOptions = {
   /**
-   * Select the format for deserialized `time` and `duration` values. "sec" and "nanosec" are used
-   * by default in ROS 2, whereas "sec" and "nsec" originates from ROS 1 and matches
+   * Select the type for deserialized `time` and `duration` values. "sec" and "nanosec" are used by
+   * default in ROS 2, whereas "sec" and "nsec" originates from ROS 1 and matches
    * `@foxglove/rostime`.
    *
    * @default "sec,nanosec"
    */
-  timeFormat?: "sec,nanosec" | "sec,nsec";
+  timeType?: "sec,nanosec" | "sec,nsec";
 };
 
 export class MessageReader<T = unknown> {
@@ -44,7 +44,7 @@ export class MessageReader<T = unknown> {
   #useRos1Time: boolean;
 
   public constructor(definitions: MessageDefinition[], options: MessageReaderOptions = {}) {
-    const { timeFormat = "sec,nanosec" } = options;
+    const { timeType = "sec,nanosec" } = options;
 
     // ros2idl modules could have constant modules before the root struct used to decode message
     const rootDefinition = definitions.find((def) => !isConstantModule(def));
@@ -56,7 +56,7 @@ export class MessageReader<T = unknown> {
     this.#definitions = new Map<string, MessageDefinitionField[]>(
       definitions.map((def) => [def.name ?? "", def.definitions]),
     );
-    this.#useRos1Time = timeFormat === "sec,nsec";
+    this.#useRos1Time = timeType === "sec,nsec";
   }
 
   // We template on R here for call site type information if the class type information T is not
