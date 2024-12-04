@@ -439,10 +439,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@foxglove/cdr@npm:^3.0.0":
-  version: 3.1.0
-  resolution: "@foxglove/cdr@npm:3.1.0"
-  checksum: 10c0/1008bdf7e051822aad6a2c6caa0499c9e7c4b75ab83575b67ee5efef3f1b649baf84c9afb40c2cb8b9b0756e75363d165fee0294c3c0f3081eb2e9795e50270f
+"@foxglove/cdr@npm:^3.3.0":
+  version: 3.3.0
+  resolution: "@foxglove/cdr@npm:3.3.0"
+  checksum: 10c0/8d24d4468509e6bda9bf8c79eff914a699b806fc7bbed2c517f9da87315c692a8c001f4c0a97cc747a2cf6af7232f3fe9596bbbb81c27b0dbfdf8cb226d01b22
   languageName: node
   linkType: hard
 
@@ -469,10 +469,37 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@foxglove/message-definition@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "@foxglove/message-definition@npm:0.2.0"
-  checksum: 10c0/d9b873ae2b358882a58abab5d081fd37cb63e8c9005f333f5b635019eebe2b73e5d805797c79c2e3aef5acf6c80efd585c8be212c9a8527c121d5fd5b61f100d
+"@foxglove/message-definition@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@foxglove/message-definition@npm:0.3.1"
+  checksum: 10c0/521fadfadcdb9bbde7d28908e429b93a387ded524f8abeb361f27ae5a6f36b8d5dc29cf23dbf0791cc366de59c48dc03aede861faa59df1c64d030b6c659981a
+  languageName: node
+  linkType: hard
+
+"@foxglove/message-definition@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@foxglove/message-definition@npm:0.4.0"
+  checksum: 10c0/235db9d110cff442ebf2921d9c166a70ef6a7e2464228353fae5bf016ef0ba6a3e56c62af1620ba1e0430f184d3544ef99a8d9409f39c79f131cb4c0f4b63934
+  languageName: node
+  linkType: hard
+
+"@foxglove/omgidl-parser@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@foxglove/omgidl-parser@npm:1.1.0"
+  dependencies:
+    tslib: "npm:^2"
+  checksum: 10c0/8dc9ef92ade323988552b7f3b3496ea19062c5be2ed7968263c7cca62f629c1875c47bf21c54f68b6211956027f561bc1817e507f5fd834678411cca89bc0189
+  languageName: node
+  linkType: hard
+
+"@foxglove/ros2idl-parser@npm:0.3.5":
+  version: 0.3.5
+  resolution: "@foxglove/ros2idl-parser@npm:0.3.5"
+  dependencies:
+    "@foxglove/message-definition": "npm:^0.4.0"
+    "@foxglove/omgidl-parser": "npm:1.1.0"
+    md5-typescript: "npm:^1.0.5"
+  checksum: 10c0/3fa52e59ff2fdd7dfc5faa9ad044deb57060500b814728d47f2e0284892af52765d666624631959879d6b7c0eff8686f5d521a6a6fe5fbdf84e453325327cfb0
   languageName: node
   linkType: hard
 
@@ -480,10 +507,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@foxglove/rosmsg2-serialization@workspace:."
   dependencies:
-    "@foxglove/cdr": "npm:^3.0.0"
+    "@foxglove/cdr": "npm:^3.3.0"
     "@foxglove/eslint-plugin": "npm:2.0.0"
-    "@foxglove/message-definition": "npm:^0.2.0"
-    "@foxglove/rosmsg": "npm:4.2.1"
+    "@foxglove/message-definition": "npm:^0.4.0"
+    "@foxglove/ros2idl-parser": "npm:0.3.5"
+    "@foxglove/rosmsg": "npm:5.0.4"
     "@foxglove/rostime": "npm:^1.1.2"
     "@sounisi5011/jest-binary-data-matchers": "npm:1.2.1"
     "@types/jest": "npm:^29.4.0"
@@ -497,15 +525,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@foxglove/rosmsg@npm:4.2.1":
-  version: 4.2.1
-  resolution: "@foxglove/rosmsg@npm:4.2.1"
+"@foxglove/rosmsg@npm:5.0.4":
+  version: 5.0.4
+  resolution: "@foxglove/rosmsg@npm:5.0.4"
   dependencies:
-    "@foxglove/message-definition": "npm:^0.2.0"
+    "@foxglove/message-definition": "npm:^0.3.1"
     md5-typescript: "npm:^1.0.5"
-  bin:
-    gendeps2: bin/gendeps2
-  checksum: 10c0/bc9ff862d55f8dc56429d8e784f5e4b1211cbbad567be4ff39df608fbfdb58703686e73210d8962c1f498beb291ebb8b6ece777db92b37ddaf1b86e0762c3e65
+  checksum: 10c0/27651394a2471a88b5d8668ccc8e72592548a49afe0b4a19aa617019a37d7bf5dd49018e2b510e4e8aa778c21e25ca4873e7900613be8d6994a771fab439d929
   languageName: node
   linkType: hard
 
@@ -5518,7 +5544,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.6.2":
+"tslib@npm:^2, tslib@npm:^2.6.2":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62

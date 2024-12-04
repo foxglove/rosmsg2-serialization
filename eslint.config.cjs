@@ -14,6 +14,9 @@ module.exports = tseslint.config(
         project: "./tsconfig.json",
       },
     },
+    rules: {
+      "@typescript-eslint/explicit-member-accessibility": "error",
+    },
   },
   ...foxglove.configs.base,
   ...foxglove.configs.jest,

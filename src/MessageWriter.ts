@@ -80,24 +80,24 @@ function throwOnWstring(): never {
  * serializes JavaScript objects to CDR-encoded binary.
  */
 export class MessageWriter {
-  rootDefinition: MessageDefinitionField[];
-  definitions: Map<string, MessageDefinitionField[]>;
+  #rootDefinition: MessageDefinitionField[];
+  #definitions: Map<string, MessageDefinitionField[]>;
 
-  constructor(definitions: MessageDefinition[]) {
+  public constructor(definitions: MessageDefinition[]) {
     // ros2idl modules could have constant modules before the root struct used to decode message
     const rootDefinition = definitions.find((def) => !isConstantModule(def));
     if (rootDefinition == undefined) {
       throw new Error("MessageReader initialized with no root MessageDefinition");
     }
-    this.rootDefinition = rootDefinition.definitions;
-    this.definitions = new Map<string, MessageDefinitionField[]>(
+    this.#rootDefinition = rootDefinition.definitions;
+    this.#definitions = new Map<string, MessageDefinitionField[]>(
       definitions.map((def) => [def.name ?? "", def.definitions]),
     );
   }
 
   /** Calculates the byte size needed to write this message in bytes. */
-  calculateByteSize(message: unknown): number {
-    return this.byteSize(this.rootDefinition, message, 4);
+  public calculateByteSize(message: unknown): number {
+    return this.#byteSize(this.#rootDefinition, message, 4);
   }
 
   /**
@@ -106,17 +106,16 @@ export class MessageWriter {
    * be equal or greater to the result of `calculateByteSize(message)`. If not
    * provided, a new Uint8Array will be allocated.
    */
-  writeMessage(message: unknown, output?: Uint8Array): Uint8Array {
+  public writeMessage(message: unknown, output?: Uint8Array): Uint8Array {
     const writer = new CdrWriter({
       buffer: output,
       size: output ? undefined : this.calculateByteSize(message),
     });
-    this.write(this.rootDefinition, message, writer);
+    this.#write(this.#rootDefinition, message, writer);
     return writer.data;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private byteSize(definition: MessageDefinitionField[], message: unknown, offset: number): number {
+  #byteSize(definition: MessageDefinitionField[], message: unknown, offset: number): number {
     const messageObj = message as Record<string, unknown> | undefined;
     let newOffset = offset;
 
@@ -125,7 +124,7 @@ export class MessageWriter {
       // `uint8 structure_needs_at_least_one_member` field when converting to IDL,
       // to satisfy the requirement from IDL of not being empty.
       // See also https://design.ros2.org/articles/legacy_interface_definition.html
-      return offset + this.getPrimitiveSize("uint8");
+      return offset + this.#getPrimitiveSize("uint8");
     }
 
     for (const field of definition) {
@@ -148,10 +147,10 @@ export class MessageWriter {
 
         if (field.isComplex === true) {
           // Complex type array
-          const nestedDefinition = this.getDefinition(field.type);
+          const nestedDefinition = this.#getDefinition(field.type);
           for (let i = 0; i < arrayLength; i++) {
             const entry = (dataArray[i] ?? {}) as Record<string, unknown>;
-            newOffset = this.byteSize(nestedDefinition, entry, newOffset);
+            newOffset = this.#byteSize(nestedDefinition, entry, newOffset);
           }
         } else if (field.type === "string") {
           // String array
@@ -162,7 +161,7 @@ export class MessageWriter {
           }
         } else {
           // Primitive array
-          const entrySize = this.getPrimitiveSize(field.type);
+          const entrySize = this.#getPrimitiveSize(field.type);
           const alignment = field.type === "time" || field.type === "duration" ? 4 : entrySize;
           newOffset += padding(newOffset, alignment);
           newOffset += entrySize * arrayLength;
@@ -170,9 +169,9 @@ export class MessageWriter {
       } else {
         if (field.isComplex === true) {
           // Complex type
-          const nestedDefinition = this.getDefinition(field.type);
+          const nestedDefinition = this.#getDefinition(field.type);
           const entry = (nestedMessage ?? {}) as Record<string, unknown>;
-          newOffset = this.byteSize(nestedDefinition, entry, newOffset);
+          newOffset = this.#byteSize(nestedDefinition, entry, newOffset);
         } else if (field.type === "string") {
           // String
           const entry = typeof nestedMessage === "string" ? nestedMessage : "";
@@ -180,7 +179,7 @@ export class MessageWriter {
           newOffset += 4 + entry.length + 1; // uint32 length prefix, string, null terminator
         } else {
           // Primitive
-          const entrySize = this.getPrimitiveSize(field.type);
+          const entrySize = this.#getPrimitiveSize(field.type);
           const alignment = field.type === "time" || field.type === "duration" ? 4 : entrySize;
           newOffset += padding(newOffset, alignment);
           newOffset += entrySize;
@@ -191,8 +190,7 @@ export class MessageWriter {
     return newOffset;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
+  #write(definition: MessageDefinitionField[], message: unknown, writer: CdrWriter): void {
     const messageObj = message as Record<string, unknown> | undefined;
 
     if (definition.length === 0) {
@@ -232,42 +230,40 @@ export class MessageWriter {
 
         if (field.isComplex === true) {
           // Complex type array
-          const nestedDefinition = this.getDefinition(field.type);
+          const nestedDefinition = this.#getDefinition(field.type);
           for (let i = 0; i < arrayLength; i++) {
             const entry = dataArray[i] ?? {};
-            this.write(nestedDefinition, entry, writer);
+            this.#write(nestedDefinition, entry, writer);
           }
         } else {
           // Primitive array
-          const arrayWriter = this.getPrimitiveArrayWriter(field.type);
+          const arrayWriter = this.#getPrimitiveArrayWriter(field.type);
           arrayWriter(nestedMessage, field.defaultValue, writer, field.arrayLength);
         }
       } else {
         if (field.isComplex === true) {
           // Complex type
-          const nestedDefinition = this.getDefinition(field.type);
+          const nestedDefinition = this.#getDefinition(field.type);
           const entry = nestedMessage ?? {};
-          this.write(nestedDefinition, entry, writer);
+          this.#write(nestedDefinition, entry, writer);
         } else {
           // Primitive
-          const primitiveWriter = this.getPrimitiveWriter(field.type);
+          const primitiveWriter = this.#getPrimitiveWriter(field.type);
           primitiveWriter(nestedMessage, field.defaultValue, writer);
         }
       }
     }
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private getDefinition(datatype: string) {
-    const nestedDefinition = this.definitions.get(datatype);
+  #getDefinition(datatype: string) {
+    const nestedDefinition = this.#definitions.get(datatype);
     if (nestedDefinition == undefined) {
       throw new Error(`Unrecognized complex type ${datatype}`);
     }
     return nestedDefinition;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private getPrimitiveSize(primitiveType: string) {
+  #getPrimitiveSize(primitiveType: string) {
     const size = PRIMITIVE_SIZES.get(primitiveType);
     if (size == undefined) {
       if (primitiveType === "wstring") {
@@ -278,8 +274,7 @@ export class MessageWriter {
     return size;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private getPrimitiveWriter(primitiveType: string) {
+  #getPrimitiveWriter(primitiveType: string) {
     const writer = PRIMITIVE_WRITERS.get(primitiveType);
     if (writer == undefined) {
       throw new Error(`Unrecognized primitive type ${primitiveType}`);
@@ -287,8 +282,7 @@ export class MessageWriter {
     return writer;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private getPrimitiveArrayWriter(primitiveType: string) {
+  #getPrimitiveArrayWriter(primitiveType: string) {
     const writer = PRIMITIVE_ARRAY_WRITERS.get(primitiveType);
     if (writer == undefined) {
       throw new Error(`Unrecognized primitive type ${primitiveType}[]`);

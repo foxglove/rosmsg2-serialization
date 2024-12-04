@@ -1,6 +1,6 @@
 {
   "name": "@foxglove/rosmsg2-serialization",
-  "version": "2.0.4",
+  "version": "3.0.0",
   "description": "ROS 2 (Robot Operating System) message serialization, for reading and writing bags and network messages",
   "license": "MIT",
   "keywords": [
@@ -39,11 +39,12 @@
     "test": "jest"
   },
   "engines": {
-    "node": ">= 14"
+    "node": ">= 20"
   },
   "devDependencies": {
     "@foxglove/eslint-plugin": "2.0.0",
-    "@foxglove/rosmsg": "4.2.1",
+    "@foxglove/ros2idl-parser": "0.3.5",
+    "@foxglove/rosmsg": "5.0.4",
     "@sounisi5011/jest-binary-data-matchers": "1.2.1",
     "@types/jest": "^29.4.0",
     "@types/prettier": "^3.0.0",
@@ -55,8 +56,8 @@
     "typescript-eslint": "8.17.0"
   },
   "dependencies": {
-    "@foxglove/cdr": "^3.0.0",
-    "@foxglove/message-definition": "^0.2.0",
+    "@foxglove/cdr": "^3.3.0",
+    "@foxglove/message-definition": "^0.4.0",
     "@foxglove/rostime": "^1.1.2"
   },
   "packageManager": "yarn@4.5.3"

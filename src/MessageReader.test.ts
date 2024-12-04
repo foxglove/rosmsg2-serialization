@@ -1,4 +1,5 @@
-import { parse as parseMessageDefinition, parseRos2idl } from "@foxglove/rosmsg";
+import { parseRos2idl } from "@foxglove/ros2idl-parser";
+import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
 
 import { MessageReader } from "./MessageReader";
 
@@ -52,52 +53,12 @@ describe("MessageReader", () => {
       { sample: 0.123456789121212121212 },
     ],
     [
-      `time stamp`,
-      [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
-      {
-        stamp: {
-          sec: 0,
-          nsec: 1,
-        },
-      },
-    ],
-    [
-      `duration stamp`,
-      [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
-      {
-        stamp: {
-          sec: 0,
-          nsec: 1,
-        },
-      },
-    ],
-    [
       `int32[] arr`,
       [
         ...[0x02, 0x00, 0x00, 0x00], // length
         ...new Uint8Array(Int32Array.of(3, 7).buffer),
       ],
       { arr: Int32Array.from([3, 7]) },
-    ],
-    [
-      `time[1] arr`,
-      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 1, nsec: 2 }] },
-    ],
-    [
-      `duration[1] arr`,
-      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 1, nsec: 2 }] },
-    ],
-    [
-      `time[] arr`,
-      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 2, nsec: 3 }] },
-    ],
-    [
-      `duration[] arr`,
-      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
-      { arr: [{ sec: 2, nsec: 3 }] },
     ],
     // unaligned access
     [
@@ -109,15 +70,6 @@ describe("MessageReader", () => {
         ...new Uint8Array(Int32Array.of(3, 7).buffer),
       ],
       { blank: 0, arr: Int32Array.from([3, 7]) },
-    ],
-    [
-      `uint8 blank\ntime[] arr`,
-      [
-        0x00,
-        ...[0x00, 0x00, 0x00], // alignment
-        ...[0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
-      ],
-      { blank: 0, arr: [{ sec: 2, nsec: 3 }] },
     ],
     [`float32[2] arr`, float32Buffer([5.5, 6.5]), { arr: Float32Array.from([5.5, 6.5]) }],
     [
@@ -275,6 +227,82 @@ describe("MessageReader", () => {
     },
   );
 
+  it.each([
+    [
+      `time stamp`,
+      [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
+      { stamp: { sec: 0, nanosec: 1 } },
+      { stamp: { sec: 0, nsec: 1 } },
+    ],
+    [
+      `duration stamp`,
+      [0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00],
+      { stamp: { sec: 0, nanosec: 1 } },
+      { stamp: { sec: 0, nsec: 1 } },
+    ],
+    [
+      `time[1] arr`,
+      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
+      { arr: [{ sec: 1, nanosec: 2 }] },
+      { arr: [{ sec: 1, nsec: 2 }] },
+    ],
+    [
+      `duration[1] arr`,
+      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00],
+      { arr: [{ sec: 1, nanosec: 2 }] },
+      { arr: [{ sec: 1, nsec: 2 }] },
+    ],
+    [
+      `time[] arr`,
+      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
+      { arr: [{ sec: 2, nanosec: 3 }] },
+      { arr: [{ sec: 2, nsec: 3 }] },
+    ],
+    [
+      `duration[] arr`,
+      [0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
+      { arr: [{ sec: 2, nanosec: 3 }] },
+      { arr: [{ sec: 2, nsec: 3 }] },
+    ],
+    // unaligned access
+    [
+      `uint8 blank\ntime[] arr`,
+      [
+        0x00,
+        ...[0x00, 0x00, 0x00], // alignment
+        ...[0x01, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00],
+      ],
+      { blank: 0, arr: [{ sec: 2, nanosec: 3 }] },
+      { blank: 0, arr: [{ sec: 2, nsec: 3 }] },
+    ],
+  ])(
+    "should deserialize %s correctly based on specified time type",
+    (
+      msgDef: string,
+      arr: Iterable<number>,
+      expected: Record<string, unknown>,
+      ros1Expected: Record<string, unknown>,
+    ) => {
+      const buffer = Uint8Array.from([0, 1, 0, 0, ...arr]);
+
+      expect(
+        new MessageReader(parseMessageDefinition(msgDef, { ros2: true })).readMessage(buffer),
+      ).toEqual(expected);
+
+      expect(
+        new MessageReader(parseMessageDefinition(msgDef, { ros2: true }), {
+          timeType: "sec,nanosec",
+        }).readMessage(buffer),
+      ).toEqual(expected);
+
+      expect(
+        new MessageReader(parseMessageDefinition(msgDef, { ros2: true }), {
+          timeType: "sec,nsec",
+        }).readMessage(buffer),
+      ).toEqual(ros1Expected);
+    },
+  );
+
   it("should deserialize a ROS 2 log message", () => {
     const buffer = Uint8Array.from(
       Buffer.from(
@@ -303,7 +331,7 @@ describe("MessageReader", () => {
     const read = reader.readMessage(buffer);
 
     expect(read).toEqual({
-      stamp: { sec: 1585866235, nsec: 112130688 },
+      stamp: { sec: 1585866235, nanosec: 112130688 },
       level: 20,
       name: "minimal_publisher",
       msg: "Publishing: 'Hello, world! 0'",
@@ -321,27 +349,27 @@ describe("MessageReader", () => {
       ),
     );
     const msgDef = `
-    geometry_msgs/msg/TransformStamped[] transforms
+    geometry_msgs/TransformStamped[] transforms
     ================================================================================
-    MSG: geometry_msgs/msg/TransformStamped
+    MSG: geometry_msgs/TransformStamped
     Header header
     string child_frame_id # the frame id of the child frame
     Transform transform
     ================================================================================
-    MSG: std_msgs/msg/Header
+    MSG: std_msgs/Header
     time stamp
     string frame_id
     ================================================================================
-    MSG: geometry_msgs/msg/Transform
+    MSG: geometry_msgs/Transform
     Vector3 translation
     Quaternion rotation
     ================================================================================
-    MSG: geometry_msgs/msg/Vector3
+    MSG: geometry_msgs/Vector3
     float64 x
     float64 y
     float64 z
     ================================================================================
-    MSG: geometry_msgs/msg/Quaternion
+    MSG: geometry_msgs/Quaternion
     float64 x
     float64 y
     float64 z
@@ -354,7 +382,7 @@ describe("MessageReader", () => {
       transforms: [
         {
           header: {
-            stamp: { sec: 1638821672, nsec: 836230505 },
+            stamp: { sec: 1638821672, nanosec: 836230505 },
             frame_id: "turtle1",
           },
           child_frame_id: "turtle1_ahead",
@@ -454,7 +482,7 @@ IDL: builtin_interfaces/Time
 module builtin_interfaces {
   struct Time {
     int32 sec;
-    uint32 nanosec;
+    uint32 nsec;
   };
 };
     `;
@@ -465,7 +493,7 @@ module builtin_interfaces {
       transforms: [
         {
           header: {
-            stamp: { sec: 1638821672, nanosec: 836230505 },
+            stamp: { sec: 1638821672, nsec: 836230505 },
             frame_id: "turtle1",
           },
           child_frame_id: "turtle1_ahead",

@@ -1,9 +1,14 @@
 import { CdrReader } from "@foxglove/cdr";
 import { MessageDefinition, MessageDefinitionField } from "@foxglove/message-definition";
-import { Time } from "@foxglove/rostime";
+import { Time as Ros1Time } from "@foxglove/rostime";
 
-export type Deserializer = (reader: CdrReader) => boolean | number | bigint | string | Time;
-export type ArrayDeserializer = (
+type Ros2Time = {
+  sec: number;
+  nanosec: number;
+};
+
+type Deserializer = (reader: CdrReader) => boolean | number | bigint | string | Ros1Time | Ros2Time;
+type ArrayDeserializer = (
   reader: CdrReader,
   count: number,
 ) =>
@@ -19,35 +24,50 @@ export type ArrayDeserializer = (
   | Float32Array
   | Float64Array
   | string[]
-  | Time[];
+  | Ros1Time[]
+  | Ros2Time[];
+
+export type MessageReaderOptions = {
+  /**
+   * Select the type for deserialized `time` and `duration` values. "sec" and "nanosec" are used by
+   * default in ROS 2, whereas "sec" and "nsec" originates from ROS 1 and matches
+   * `@foxglove/rostime`.
+   *
+   * @default "sec,nanosec"
+   */
+  timeType?: "sec,nanosec" | "sec,nsec";
+};
 
 export class MessageReader<T = unknown> {
-  rootDefinition: MessageDefinitionField[];
-  definitions: Map<string, MessageDefinitionField[]>;
+  #rootDefinition: MessageDefinitionField[];
+  #definitions: Map<string, MessageDefinitionField[]>;
+  #useRos1Time: boolean;
 
-  constructor(definitions: MessageDefinition[]) {
+  public constructor(definitions: MessageDefinition[], options: MessageReaderOptions = {}) {
+    const { timeType = "sec,nanosec" } = options;
+
     // ros2idl modules could have constant modules before the root struct used to decode message
     const rootDefinition = definitions.find((def) => !isConstantModule(def));
 
     if (rootDefinition == undefined) {
       throw new Error("MessageReader initialized with no root MessageDefinition");
     }
-    this.rootDefinition = rootDefinition.definitions;
-    this.definitions = new Map<string, MessageDefinitionField[]>(
+    this.#rootDefinition = rootDefinition.definitions;
+    this.#definitions = new Map<string, MessageDefinitionField[]>(
       definitions.map((def) => [def.name ?? "", def.definitions]),
     );
+    this.#useRos1Time = timeType === "sec,nsec";
   }
 
   // We template on R here for call site type information if the class type information T is not
   // known or available
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
-  readMessage<R = T>(buffer: ArrayBufferView): R {
+  public readMessage<R = T>(buffer: ArrayBufferView): R {
     const reader = new CdrReader(buffer);
-    return this.readComplexType(this.rootDefinition, reader) as R;
+    return this.#readComplexType(this.#rootDefinition, reader) as R;
   }
 
-  // eslint-disable-next-line @foxglove/prefer-hash-private
-  private readComplexType(
+  #readComplexType(
     definition: MessageDefinitionField[],
     reader: CdrReader,
   ): Record<string, unknown> {
@@ -69,7 +89,7 @@ export class MessageReader<T = unknown> {
 
       if (field.isComplex === true) {
         // Complex type
-        const nestedDefinition = this.definitions.get(field.type);
+        const nestedDefinition = this.#definitions.get(field.type);
         if (nestedDefinition == undefined) {
           throw new Error(`Unrecognized complex type ${field.type}`);
         }
@@ -79,16 +99,18 @@ export class MessageReader<T = unknown> {
           const arrayLength = field.arrayLength ?? reader.sequenceLength();
           const array = [];
           for (let i = 0; i < arrayLength; i++) {
-            array.push(this.readComplexType(nestedDefinition, reader));
+            array.push(this.#readComplexType(nestedDefinition, reader));
           }
           msg[field.name] = array;
         } else {
-          msg[field.name] = this.readComplexType(nestedDefinition, reader);
+          msg[field.name] = this.#readComplexType(nestedDefinition, reader);
         }
       } else {
         // Primitive type
         if (field.isArray === true) {
-          const deser = typedArrayDeserializers.get(field.type);
+          const deser = (
+            this.#useRos1Time ? ros1TypedArrayDeserializers : typedArrayDeserializers
+          ).get(field.type);
           if (deser == undefined) {
             throw new Error(`Unrecognized primitive array type ${field.type}[]`);
           }
@@ -96,7 +118,7 @@ export class MessageReader<T = unknown> {
           const arrayLength = field.arrayLength ?? reader.sequenceLength();
           msg[field.name] = deser(reader, arrayLength);
         } else {
-          const deser = deserializers.get(field.type);
+          const deser = (this.#useRos1Time ? ros1TimeDeserializers : deserializers).get(field.type);
           if (deser == undefined) {
             throw new Error(`Unrecognized primitive type ${field.type}`);
           }
@@ -125,9 +147,14 @@ const deserializers = new Map<string, Deserializer>([
   ["float32", (reader) => reader.float32()],
   ["float64", (reader) => reader.float64()],
   ["string", (reader) => reader.string()],
+  ["wstring", throwOnWstring],
+  ["time", (reader) => ({ sec: reader.int32(), nanosec: reader.uint32() })],
+  ["duration", (reader) => ({ sec: reader.int32(), nanosec: reader.uint32() })],
+]);
+const ros1TimeDeserializers = new Map<string, Deserializer>([
+  ...deserializers,
   ["time", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
   ["duration", (reader) => ({ sec: reader.int32(), nsec: reader.uint32() })],
-  ["wstring", throwOnWstring],
 ]);
 
 const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
@@ -143,9 +170,14 @@ const typedArrayDeserializers = new Map<string, ArrayDeserializer>([
   ["float32", (reader, count) => reader.float32Array(count)],
   ["float64", (reader, count) => reader.float64Array(count)],
   ["string", readStringArray],
+  ["wstring", throwOnWstring],
   ["time", readTimeArray],
   ["duration", readTimeArray],
-  ["wstring", throwOnWstring],
+]);
+const ros1TypedArrayDeserializers = new Map<string, ArrayDeserializer>([
+  ...typedArrayDeserializers,
+  ["time", readRos1TimeArray],
+  ["duration", readRos1TimeArray],
 ]);
 
 function readBoolArray(reader: CdrReader, count: number): boolean[] {
@@ -164,12 +196,22 @@ function readStringArray(reader: CdrReader, count: number): string[] {
   return array;
 }
 
-function readTimeArray(reader: CdrReader, count: number): Time[] {
-  const array = new Array<Time>(count);
+function readRos1TimeArray(reader: CdrReader, count: number): Ros1Time[] {
+  const array = new Array<Ros1Time>(count);
   for (let i = 0; i < count; i++) {
     const sec = reader.int32();
     const nsec = reader.uint32();
     array[i] = { sec, nsec };
+  }
+  return array;
+}
+
+function readTimeArray(reader: CdrReader, count: number): Ros2Time[] {
+  const array = new Array<Ros2Time>(count);
+  for (let i = 0; i < count; i++) {
+    const sec = reader.int32();
+    const nanosec = reader.uint32();
+    array[i] = { sec, nanosec };
   }
   return array;
 }
