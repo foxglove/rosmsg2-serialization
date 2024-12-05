@@ -2,7 +2,7 @@ import { CdrReader } from "@foxglove/cdr";
 import { MessageDefinition, MessageDefinitionField } from "@foxglove/message-definition";
 import { Time as Ros1Time } from "@foxglove/rostime";
 
-import { messageDefinitionHasData } from "./messageDefinitionHasData";
+import { messageDefinitionHasDataFields } from "./messageDefinitionHasDataFields";
 
 type Ros2Time = {
   sec: number;
@@ -75,7 +75,7 @@ export class MessageReader<T = unknown> {
   ): Record<string, unknown> {
     const msg: Record<string, unknown> = {};
 
-    if (!messageDefinitionHasData(definition)) {
+    if (!messageDefinitionHasDataFields(definition)) {
       // In case a message definition definition is empty, ROS 2 adds a
       // `uint8 structure_needs_at_least_one_member` field when converting to IDL,
       // to satisfy the requirement from IDL of not being empty.
