@@ -515,8 +515,23 @@ module builtin_interfaces {
     expect(read).toEqual({});
   });
 
-  it("should deserialize a custom msg with a std_msgs/msg/Empty field", () => {
-    const buffer = Uint8Array.from(Buffer.from("00010000000000007b000000", "hex"));
+  it("should deserialize a custom msg with a std_msgs/msg/Empty field followed by uint8", () => {
+    // Note: ROS/FastDDS seems to add 2 extra padding bytes at the end
+    const buffer = Uint8Array.from(Buffer.from("00010000007b0000", "hex"));
+    const msgDef = `
+    std_msgs/msg/Empty empty
+    uint8 uint_8_field
+    ================================================================================
+    MSG: std_msgs/msg/Empty
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({ empty: {}, uint_8_field: 123 });
+  });
+
+  it("should deserialize a custom msg with a std_msgs/msg/Empty field followed by int32", () => {
+    const buffer = Uint8Array.from(Buffer.from("00010000000000007b000001", "hex"));
     const msgDef = `
     std_msgs/msg/Empty empty
     int32 int_32_field
@@ -526,7 +541,22 @@ module builtin_interfaces {
     const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
     const read = reader.readMessage(buffer);
 
-    expect(read).toEqual({ empty: {}, int_32_field: 123 });
+    expect(read).toEqual({ empty: {}, int_32_field: 16777339 });
+  });
+
+  it("should deserialize a custom msg with an empty message (with constants) followed by int32", () => {
+    const buffer = Uint8Array.from(Buffer.from("00010000000000007b000001", "hex"));
+    const msgDef = `
+    custom_msgs/msg/Nothing empty
+    int32 int_32_field
+    ================================================================================
+    MSG: custom_msgs/msg/Nothing
+    int32 EXAMPLE=123
+    `;
+    const reader = new MessageReader(parseMessageDefinition(msgDef, { ros2: true }));
+    const read = reader.readMessage(buffer);
+
+    expect(read).toEqual({ empty: {}, int_32_field: 16777339 });
   });
 
   it("ros2idl should choose non-constant root definition", () => {
