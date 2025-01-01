@@ -53,7 +53,7 @@
     "prettier": "3.4.1",
     "ts-jest": "29.2.5",
     "typescript": "5.7.2",
-    "typescript-eslint": "8.17.0"
+    "typescript-eslint": "8.19.0"
   },
   "dependencies": {
     "@foxglove/cdr": "^3.3.0",
