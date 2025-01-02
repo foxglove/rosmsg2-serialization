@@ -635,4 +635,67 @@ module builtin_interfaces {
       );
     },
   );
+
+  it("should serialize a ROS 2 rcl_interfaces/srv/SetParameters Request with default values", () => {
+    // The expected serialized message below was generated with the following python script:
+    // ```py
+    // from rclpy.serialization import serialize_message
+    // from rcl_interfaces.srv import SetParameters
+    // from rcl_interfaces.msg import Parameter, ParameterValue, ParameterType
+    // request = SetParameters.Request()
+    // request.parameters = [
+    //     Parameter(name='foo', value=ParameterValue(type=ParameterType.PARAMETER_INTEGER, integer_value=42)),
+    //     Parameter(name='bar', value=ParameterValue(type=ParameterType.PARAMETER_STRING, string_value="baz")),
+    // ]
+    // print(serialize_message(request).hex())
+    // ```
+    const expected = Uint8Array.from(
+      Buffer.from(
+        "000100000200000004000000666f6f00020000002a00000000000000000000000000000001000000000000000000000000000000000000000000000000000000040000006261720004000000000000000000000000000000000000000400000062617a00000000000000000000000000000000000000000000000000000000000000000000000000",
+        "hex",
+      ),
+    );
+    const msgDef = `
+    Parameter[] parameters
+    ================================================================================
+    MSG: rcl_interfaces/msg/Parameter
+    string name
+    ParameterValue value
+    ================================================================================
+    MSG: rcl_interfaces/msg/ParameterValue
+    uint8 type
+    bool bool_value
+    int64 integer_value
+    float64 double_value
+    string string_value
+    byte[] byte_array_value
+    bool[] bool_array_value
+    int64[] integer_array_value
+    float64[] double_array_value
+    string[] string_array_value
+    `;
+
+    const writer = new MessageWriter(parseMessageDefinition(msgDef, { ros2: true }));
+    const message = {
+      parameters: [
+        {
+          name: "foo",
+          value: {
+            type: 2,
+            integer_value: 42,
+          },
+        },
+        {
+          name: "bar",
+          value: {
+            type: 4,
+            string_value: "baz",
+          },
+        },
+      ],
+    };
+    const written = writer.writeMessage(message);
+    expect(written.buffer).toBytesEqual(expected);
+    expect(writer.calculateByteSize(message)).toEqual(expected.byteLength);
+  });
 });

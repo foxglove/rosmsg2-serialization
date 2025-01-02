@@ -384,7 +384,7 @@ function boolArray(
     const array = new Int8Array(value);
     writer.int8Array(array);
   } else {
-    writer.int8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.int8Array((defaultValue ?? new Int8Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -400,7 +400,7 @@ function int8Array(
     const array = new Int8Array(value);
     writer.int8Array(array);
   } else {
-    writer.int8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.int8Array((defaultValue ?? new Int8Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -418,7 +418,7 @@ function uint8Array(
     const array = new Uint8Array(value);
     writer.uint8Array(array);
   } else {
-    writer.uint8Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.uint8Array((defaultValue ?? new Uint8Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -434,7 +434,7 @@ function int16Array(
     const array = new Int16Array(value);
     writer.int16Array(array);
   } else {
-    writer.int16Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.int16Array((defaultValue ?? new Int16Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -450,7 +450,7 @@ function uint16Array(
     const array = new Uint16Array(value);
     writer.uint16Array(array);
   } else {
-    writer.uint16Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.uint16Array((defaultValue ?? new Uint16Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -466,7 +466,7 @@ function int32Array(
     const array = new Int32Array(value);
     writer.int32Array(array);
   } else {
-    writer.int32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.int32Array((defaultValue ?? new Int32Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -482,7 +482,7 @@ function uint32Array(
     const array = new Uint32Array(value);
     writer.uint32Array(array);
   } else {
-    writer.uint32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.uint32Array((defaultValue ?? new Uint32Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -498,7 +498,7 @@ function int64Array(
     const array = new BigInt64Array(value);
     writer.int64Array(array);
   } else {
-    writer.int64Array((defaultValue ?? new Array(arrayLength).fill(0n)) as bigint[]);
+    writer.int64Array((defaultValue ?? new BigInt64Array(arrayLength ?? 0).fill(0n)) as bigint[]);
   }
 }
 
@@ -514,7 +514,7 @@ function uint64Array(
     const array = new BigUint64Array(value);
     writer.uint64Array(array);
   } else {
-    writer.uint64Array((defaultValue ?? new Array(arrayLength).fill(0n)) as bigint[]);
+    writer.uint64Array((defaultValue ?? new BigUint64Array(arrayLength ?? 0).fill(0n)) as bigint[]);
   }
 }
 
@@ -530,7 +530,7 @@ function float32Array(
     const array = new Float32Array(value);
     writer.float32Array(array);
   } else {
-    writer.float32Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.float32Array((defaultValue ?? new Float32Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -546,7 +546,7 @@ function float64Array(
     const array = new Float64Array(value);
     writer.float64Array(array);
   } else {
-    writer.float64Array((defaultValue ?? new Array(arrayLength).fill(0)) as number[]);
+    writer.float64Array((defaultValue ?? new Float64Array(arrayLength ?? 0).fill(0)) as number[]);
   }
 }
 
@@ -561,7 +561,7 @@ function stringArray(
       writer.string(typeof item === "string" ? item : "");
     }
   } else {
-    const array = (defaultValue ?? new Array(arrayLength).fill("")) as string[];
+    const array = (defaultValue ?? new Array(arrayLength ?? 0).fill("")) as string[];
     for (const item of array) {
       writer.string(item);
     }
